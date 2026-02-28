@@ -3,6 +3,7 @@ using System;
 using Launcher.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Launcher.DAL.Migrations
 {
     [DbContext(typeof(LauncherDbContext))]
-    partial class LauncherDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260226185136_AddConstraintsAndGenre")]
+    partial class AddConstraintsAndGenre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.23");
@@ -39,7 +42,7 @@ namespace Launcher.DAL.Migrations
                     b.Property<Guid?>("GenreId")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("IsAvalible")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
