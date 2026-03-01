@@ -1,6 +1,7 @@
-﻿using Launcher.DAL.Context;
-using Launcher.DAL.Entities;
-using Launcher.DAL.Factories;
+﻿using Launcher.DAL.Entities;
+using Launcher.DAL.Seeds;
+using Microsoft.EntityFrameworkCore;
+using FluentAssertions;
 
 namespace Launcher.DAL.Tests;
 
@@ -27,8 +28,70 @@ public class GameTitleTests : DbContextTestsBase
         await LauncherDbContextSut.SaveChangesAsync();
         
         //Assert
-        await using var dbx = base.DbContextFactory.CreateDbContext();
+        await using var dbx = await DbContextFactory.CreateDbContextAsync();
         var entityFromDb = dbx.GameTitles.First(titleEntity => titleEntity.Id == entity.Id );
-        Assert.Equal(entity.Id, entityFromDb.Id);
+        entityFromDb.Should().BeEquivalentTo(entity, options => options
+            .Excluding(e => e.Achievements)
+            .Excluding(e => e.GameTitlePlatforms)
+            .Excluding(e => e.LibraryTitles)
+            .Excluding(e => e.Reviews)
+        );
+    }
+
+    [Fact]
+    public async Task GetAll_GameTitles_ContainsSeededEldenRing()
+    {
+        //Act
+        var entities = await LauncherDbContextSut.GameTitles.ToArrayAsync();
+        
+        //Assert
+        entities.Should().ContainEquivalentOf(GameTitleSeeds.EldenRing, options => options
+            .Excluding(e => e.Achievements)
+            .Excluding(e => e.GameTitlePlatforms)
+            .Excluding(e => e.LibraryTitles)
+            .Excluding(e => e.Reviews)
+        );
+    }
+
+    [Fact]
+    public async Task Update_GameTitle_ChangesPersisted()
+    {
+        //Arrange
+        const string originalName = "Terrarie";
+        var entity = new GameTitleEntity
+        {
+            Name = originalName,
+            Description = "Dig, fight, explore, build! Nothing is impossible in this action-packed adventure game. Four Pack also available!",
+            PegiRating = 12,
+            PriceCents = 1075,
+            ReleaseDate = new DateTime(2011, 5, 16),
+            Publisher = "Re-Logic",
+            IsAvailable = true,
+            CoverImageUrl = "https://upload.wikimedia.org/wikipedia/en/1/1a/Terraria_Steam_artwork.jpg"
+        };
+        
+        LauncherDbContextSut.GameTitles.Add(entity);
+        await LauncherDbContextSut.SaveChangesAsync();
+        
+        LauncherDbContextSut.ChangeTracker.Clear();
+        
+        //Act
+        await using var actDbx = await DbContextFactory.CreateDbContextAsync();
+        var gameToUpdate = await actDbx.GameTitles.FindAsync(entity.Id);
+        
+        gameToUpdate.Should().NotBeNull();
+        gameToUpdate.Name = "Terraria";
+        gameToUpdate.PriceCents = 975;
+        
+        await actDbx.SaveChangesAsync();
+        
+        //Assert
+        await using var assertDbx = await DbContextFactory.CreateDbContextAsync();
+        var updatedGame = await assertDbx.GameTitles.FindAsync(entity.Id);
+        
+        updatedGame.Should().NotBeNull();
+        updatedGame.Name.Should().Be("Terraria");
+        updatedGame.PriceCents.Should().Be(975);
+        updatedGame.Description.Should().Be(entity.Description);
     }
 }
