@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Launcher.DAL.Context;
 
-public class LauncherDbContext : DbContext
+public class LauncherDbContext(DbContextOptions<LauncherDbContext> options) : DbContext(options)
 {
-    public LauncherDbContext(DbContextOptions<LauncherDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<LibraryEntity> Libraries => Set<LibraryEntity>();
     public DbSet<GameTitleEntity> GameTitles => Set<GameTitleEntity>();
