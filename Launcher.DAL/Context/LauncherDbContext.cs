@@ -67,13 +67,7 @@ public class LauncherDbContext(DbContextOptions<LauncherDbContext> options) : Db
             .Property(x => x.AvatarUrl)
             .HasMaxLength(2048);
 
-
-
-        modelBuilder.Entity<GameTitleEntity>()
-            .HasOne(x => x.Genre)
-            .WithMany(x => x.Games)
-            .HasForeignKey(x => x.GenreId)
-            .OnDelete(DeleteBehavior.SetNull);
+        
 
         modelBuilder.Entity<GameTitleEntity>()
             .HasIndex(x => x.Name);

@@ -22,7 +22,9 @@ public class DbContextTestsBase : IAsyncLifetime
         await LauncherDbContextSut.Database.EnsureCreatedAsync();
 
         await using var dbx = await DbContextFactory.CreateDbContextAsync();
-        dbx.SeedGameTitles();
+        dbx
+            .SeedGameTitles()
+            .SeedGenres();
         await dbx.SaveChangesAsync();
     }
 
