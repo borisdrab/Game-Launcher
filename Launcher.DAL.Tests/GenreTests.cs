@@ -1,10 +1,11 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Launcher.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using Xunit.Abstractions;
 
 namespace Launcher.DAL.Tests;
 
-public class GenreTests : DbContextTestsBase
+public class GenreTests(ITestOutputHelper output) : DbContextTestsBase(output)
 {
     [Fact]
     public async Task AddNew_Genre_Persisted()

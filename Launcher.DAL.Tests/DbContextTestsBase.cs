@@ -1,14 +1,19 @@
-﻿using Launcher.DAL.Context;
+﻿using Launcher.Common.Tests;
+using Launcher.DAL.Context;
 using Launcher.DAL.Factories;
 using Launcher.DAL.Seeds;
 using Microsoft.EntityFrameworkCore;
+using Xunit.Abstractions;
 
 namespace Launcher.DAL.Tests;
 
 public class DbContextTestsBase : IAsyncLifetime
 {
-    protected DbContextTestsBase()
+    protected DbContextTestsBase(ITestOutputHelper output)
     {
+        XUnitTestOutputConverter converter = new(output);
+        Console.SetOut(converter);
+        
         DbContextFactory = new LauncherDbContextSqLiteFactory(GetType().FullName!);
         LauncherDbContextSut = DbContextFactory.CreateDbContext();    
     }

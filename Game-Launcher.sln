@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.DAL", "Launcher.DA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.DAL.Tests", "Launcher.DAL.Tests\Launcher.DAL.Tests.csproj", "{64564535-9E0B-4A91-9BF3-467A240DFFAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Common.Tests", "Launcher.Common.Tests\Launcher.Common.Tests.csproj", "{DF426A53-8AF2-42E2-A310-FA492A357321}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{64564535-9E0B-4A91-9BF3-467A240DFFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64564535-9E0B-4A91-9BF3-467A240DFFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64564535-9E0B-4A91-9BF3-467A240DFFAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF426A53-8AF2-42E2-A310-FA492A357321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF426A53-8AF2-42E2-A310-FA492A357321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF426A53-8AF2-42E2-A310-FA492A357321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF426A53-8AF2-42E2-A310-FA492A357321}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

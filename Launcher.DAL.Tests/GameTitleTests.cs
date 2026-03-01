@@ -1,11 +1,12 @@
 ﻿using Launcher.DAL.Entities;
 using Launcher.DAL.Seeds;
 using Microsoft.EntityFrameworkCore;
-using FluentAssertions;
+using AwesomeAssertions;
+using Xunit.Abstractions;
 
 namespace Launcher.DAL.Tests;
 
-public class GameTitleTests : DbContextTestsBase
+public class GameTitleTests(ITestOutputHelper output) : DbContextTestsBase(output)
 {
     [Fact]
     public async Task AddNew_GameTitle_Persisted()
@@ -29,7 +30,8 @@ public class GameTitleTests : DbContextTestsBase
         
         //Assert
         await using var dbx = await DbContextFactory.CreateDbContextAsync();
-        var entityFromDb = dbx.GameTitles.First(titleEntity => titleEntity.Id == entity.Id );
+        var entityFromDb = await dbx.GameTitles.FirstAsync(titleEntity => titleEntity.Id == entity.Id );
+        entityFromDb.Should().NotBeNull();
         entityFromDb.Should().BeEquivalentTo(entity, options => options
             .Excluding(e => e.Achievements)
             .Excluding(e => e.GameTitlePlatforms)
