@@ -30,7 +30,12 @@ public class DbContextTestsBase : IAsyncLifetime
         dbx
             .SeedGameTitles()
             .SeedGenres()
-            .SeedUsers();
+            .SeedUsers()
+            .SeedLibraries()
+            .SeedLibraryTitles()
+            .SeedPlatforms()
+            .SeedGameTitlePlatforms()
+            .SeedReviews();
         await dbx.SaveChangesAsync();
     }
 
