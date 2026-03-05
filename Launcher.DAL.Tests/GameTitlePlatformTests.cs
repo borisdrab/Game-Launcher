@@ -12,7 +12,7 @@ public class GameTitlePlatformTests(ITestOutputHelper output) : DbContextTestsBa
     {
         //Arrange
         var seededGame = await LauncherDbContextSut.GameTitles.FirstAsync(gameTitleEntity => gameTitleEntity.Name == "ELDEN RING");
-        var seededPlatform = await LauncherDbContextSut.Platforms.FirstAsync(platformEntity => platformEntity.Name == "PC");
+        var seededPlatform = await LauncherDbContextSut.Platforms.FirstAsync(platformEntity => platformEntity.Name == "PlayStation 5");
         var entity = new GameTitlePlatformEntity()
         {
             GameTitleId = seededGame.Id,
