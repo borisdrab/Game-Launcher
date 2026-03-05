@@ -1,9 +1,10 @@
+using Launcher.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Launcher.DAL.Context;
+namespace Launcher.DAL.Factories;
 
-public class LauncherDbContextFactory : IDesignTimeDbContextFactory<LauncherDbContext>
+public class DesignTimeLauncherDbContextFactory : IDesignTimeDbContextFactory<LauncherDbContext>
 {
     public LauncherDbContext CreateDbContext(string[] args)
     {
