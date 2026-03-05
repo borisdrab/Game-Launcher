@@ -1,6 +1,6 @@
 namespace Launcher.DAL.Entities;
 
-public class UserEntity
+public class UserEntity : IEntity
 {
     public Guid Id { get; set; }
     public string UserName { get; set; } = string.Empty;

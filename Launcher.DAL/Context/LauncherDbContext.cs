@@ -20,6 +20,8 @@ public class LauncherDbContext : DbContext
     public DbSet<PlatformEntity> Platforms => Set<PlatformEntity>();
     public DbSet<GameTitlePlatformEntity> GameTitlePlatforms => Set<GameTitlePlatformEntity>();
     
+    public DbSet<GameTitleGenreEntity> GameTitleGenres => Set<GameTitleGenreEntity>();
+    
     public DbSet<ReviewEntity> Reviews => Set<ReviewEntity>();
     
     public DbSet<AchievementEntity> Achievements => Set<AchievementEntity>();
@@ -71,15 +73,9 @@ public class LauncherDbContext : DbContext
         modelBuilder.Entity<UserEntity>()
             .Property(x => x.AvatarUrl)
             .HasMaxLength(2048);
-
-
-
-        modelBuilder.Entity<GameTitleEntity>()
-            .HasOne(x => x.Genre)
-            .WithMany(x => x.Games)
-            .HasForeignKey(x => x.GenreId)
-            .OnDelete(DeleteBehavior.SetNull);
-
+        
+        
+        
         modelBuilder.Entity<GameTitleEntity>()
             .HasIndex(x => x.Name);
 
@@ -107,6 +103,8 @@ public class LauncherDbContext : DbContext
         //modelBuilder.Entity<GameTitleEntity>()
         //.Property(x => x.Developer)
         //.HasMaxLength(128);
+        
+        
 
         modelBuilder.Entity<GameTitlePlatformEntity>()
             .HasKey(x => new { x.GameTitleId, x.PlatformId });
@@ -212,6 +210,23 @@ public class LauncherDbContext : DbContext
             .Property(x => x.Name)
             .HasMaxLength(128)
             .IsRequired();
+        
+        
+        
+        modelBuilder.Entity<GameTitleGenreEntity>()
+            .HasKey(x => new { x.GameTitleId, x.GenreId });
+        
+        modelBuilder.Entity<GameTitleGenreEntity>()
+            .HasOne(x => x.GameTitle)
+            .WithMany(x=> x.GameTitleGenres)
+            .HasForeignKey(x => x.GameTitleId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<GameTitleGenreEntity>()
+            .HasOne(x => x.Genre)
+            .WithMany(x => x.GamesTitleGenres)
+            .HasForeignKey(x => x.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
         
     }
 }
