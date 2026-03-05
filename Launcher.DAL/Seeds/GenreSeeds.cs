@@ -23,12 +23,26 @@ public static class GenreSeeds
         Name = "MMORPG"
     };
 
+    public static readonly GenreEntity OpenWorld = new()
+    {
+        Id = Guid.Parse("AA98D01F-CD30-4D97-BD9F-2A056042BC49"),
+        Name = "Open World"
+    };
+
+    public static readonly GenreEntity Rpg = new()
+    {
+        Id = Guid.Parse("7679E383-E2FE-4946-860B-849587C9430F"),
+        Name = "RPG"
+    };
+
     public static DbContext SeedGenres(this DbContext dbx)
     {
         dbx.Set<GenreEntity>().AddRange(
             ActionRpg,
             FirstPersonShooter,
-            Mmorpg
+            Mmorpg,
+            OpenWorld,
+            Rpg
         );
         
         return dbx;

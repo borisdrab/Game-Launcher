@@ -30,6 +30,7 @@ public class DbContextTestsBase : IAsyncLifetime
         dbx
             .SeedGameTitles()
             .SeedGenres()
+            .SeedGameTitleGenres()
             .SeedUsers()
             .SeedLibraries()
             .SeedLibraryTitles()
