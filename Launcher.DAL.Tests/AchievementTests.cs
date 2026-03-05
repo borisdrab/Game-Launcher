@@ -33,7 +33,7 @@ public class AchievementTests(ITestOutputHelper output) : DbContextTestsBase(out
             .Excluding(achievement => achievement.UserAchievements)
             .Excluding(achievement => achievement.GameTitle)
         );
-        entity.GameTitleId.Should().Be(eldenRingGame.Id);
+        entityFromDb.GameTitleId.Should().Be(eldenRingGame.Id);
     }
 
     [Fact]
