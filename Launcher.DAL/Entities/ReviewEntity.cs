@@ -1,6 +1,6 @@
 namespace Launcher.DAL.Entities;
 
-public class ReviewEntity
+public class ReviewEntity : IEntity
 {
     public Guid Id { get; set; }
     

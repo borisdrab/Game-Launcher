@@ -1,6 +1,6 @@
 namespace Launcher.DAL.Entities;
 
-public class PlatformEntity
+public class PlatformEntity : IEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

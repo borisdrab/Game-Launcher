@@ -1,6 +1,6 @@
 namespace Launcher.DAL.Entities;
 
-public class AchievementEntity
+public class AchievementEntity : IEntity
 {
     public Guid Id { get; set; }
     
