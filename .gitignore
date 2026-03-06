@@ -360,8 +360,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-<<<<<<< HEAD
-=======
 
 # VS Code files for those working on multiple tools
 .vscode/*
@@ -387,6 +385,3 @@ FodyWeavers.xsd
 # Rider
 .idea/
 .DS_Store
-
-.idea/
->>>>>>> 0b3a6b3 (DAL: added more entities and EF migrations)
