@@ -53,9 +53,9 @@ public class AchievementTests(ITestOutputHelper output) : DbContextTestsBase(out
         
         //Pre-Assert to check if the achievement has been correctly added to the database
         var existsBeforeDeletion = await LauncherDbContextSut.Achievements.AnyAsync(achievementEntity => achievementEntity.Id == entity.Id);
-        output.WriteLine("Checking if achievement was added to the database successfully before attempting to remove it...");
+        Output.WriteLine("Checking if achievement was added to the database successfully before attempting to remove it...");
         existsBeforeDeletion.Should().BeTrue();
-        output.WriteLine("Check succeeded, continuing...");
+        Output.WriteLine("Check succeeded, continuing...");
         
         LauncherDbContextSut.ChangeTracker.Clear();
         
