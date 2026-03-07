@@ -9,8 +9,10 @@ namespace Launcher.DAL.Tests;
 
 public class DbContextTestsBase : IAsyncLifetime
 {
+    protected readonly ITestOutputHelper Output;
     protected DbContextTestsBase(ITestOutputHelper output)
     {
+        Output = output;
         XUnitTestOutputConverter converter = new(output);
         Console.SetOut(converter);
         
