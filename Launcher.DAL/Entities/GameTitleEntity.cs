@@ -12,7 +12,6 @@ public class GameTitleEntity : IEntity
     
     public string CoverImageUrl { get; set; } = string.Empty;
     public string Publisher { get; set; } = string.Empty;
-    //public string Developer { get; set; } = string.Empty;
     
     public DateTime? ReleaseDate  { get; set; }
     public bool IsAvailable { get; set; } = true;

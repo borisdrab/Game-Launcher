@@ -1,4 +1,4 @@
-﻿namespace Game_Launcher;
+﻿namespace Launcher;
 
 public class Program
 {
