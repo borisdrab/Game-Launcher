@@ -94,11 +94,6 @@ public class LauncherDbContext(DbContextOptions<LauncherDbContext> options) : Db
         modelBuilder.Entity<GameTitleEntity>()
             .Property(x => x.Publisher)
             .HasMaxLength(128);
-
-        //modelBuilder.Entity<GameTitleEntity>()
-        //.Property(x => x.Developer)
-        //.HasMaxLength(128);
-        
         
 
         modelBuilder.Entity<GameTitlePlatformEntity>()
