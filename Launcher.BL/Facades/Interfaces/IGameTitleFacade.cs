@@ -1,6 +1,8 @@
+using Launcher.BL.Models;
+
 namespace Launcher.BL.Facades.Interfaces;
 
-public class IGameTitleFacade
+public interface IGameTitleFacade
+    : IFacade<GameTitleListModel, GameTitleDetailModel>
 {
-    
 }
