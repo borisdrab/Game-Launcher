@@ -103,4 +103,104 @@ public class GenreFacadeTests : FacadeTestsBase
         // Assert - no exception should be thrown
         await action.Should().NotThrowAsync();
     }
+
+    // --- Query / Filter / Sort tests ---
+
+    [Fact]
+    public async Task Query_SearchByName_ReturnsMatchingGenres()
+    {
+        // Arrange - search for "RPG" (should match "Action-RPG", "MMORPG", "RPG")
+        var query = new QueryObject();
+        query.SearchTerm = "RPG";
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public async Task Query_SearchByName_NoMatch_ReturnsEmpty()
+    {
+        // Arrange - search for something that does not exist
+        var query = new QueryObject();
+        query.SearchTerm = "NonExistentGenre";
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert
+        var resultList = results.ToList();
+        resultList.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Query_SortByNameAscending_ReturnsInOrder()
+    {
+        // Arrange
+        var query = new QueryObject();
+        query.SortBy = "Name";
+        query.SortDescending = false;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - first should be "Action-RPG", last "RPG"
+        var resultList = results.ToList();
+        resultList.First().Name.Should().Be("Action-RPG");
+        resultList.Last().Name.Should().Be("RPG");
+    }
+
+    [Fact]
+    public async Task Query_SortByNameDescending_ReturnsInReverseOrder()
+    {
+        // Arrange
+        var query = new QueryObject();
+        query.SortBy = "Name";
+        query.SortDescending = true;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - first should be "RPG", last "Action-RPG"
+        var resultList = results.ToList();
+        resultList.First().Name.Should().Be("RPG");
+        resultList.Last().Name.Should().Be("Action-RPG");
+    }
+
+    [Fact]
+    public async Task Query_SearchAndSort_Combined()
+    {
+        // Arrange - search for "RPG" and sort descending
+        var query = new QueryObject();
+        query.SearchTerm = "RPG";
+        query.SortBy = "Name";
+        query.SortDescending = true;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - should find 3 genres, sorted Z-A
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(3);
+        resultList[0].Name.Should().Be("RPG");
+        resultList[1].Name.Should().Be("MMORPG");
+        resultList[2].Name.Should().Be("Action-RPG");
+    }
+
+    [Fact]
+    public async Task Query_EmptyQuery_ReturnsAllGenres()
+    {
+        // Arrange - no search, no sort
+        var query = new QueryObject();
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - should return all 5 seeded genres
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(5);
+    }
 }

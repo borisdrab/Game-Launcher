@@ -32,6 +32,33 @@ public class PlatformFacade
         return _mapper.MapToListModel(entities);
     }
 
+    public override async Task<IEnumerable<PlatformListModel>> GetAsync(QueryObject query)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        
+        IQueryable<PlatformEntity> dbQuery = dbContext.Platforms.AsNoTracking();
+        
+        if (string.IsNullOrWhiteSpace(query.SearchTerm) == false)
+        {
+            dbQuery = dbQuery.Where(p => p.Name.Contains(query.SearchTerm));
+        }
+        
+        if (query.SortBy == "Name")
+        {
+            if (query.SortDescending)
+            {
+                dbQuery = dbQuery.OrderByDescending(p => p.Name);
+            }
+            else
+            {
+                dbQuery = dbQuery.OrderBy(p => p.Name);
+            }
+        }
+        
+        var entities = await dbQuery.ToListAsync();
+        return _mapper.MapToListModel(entities);
+    }
+
     public override async Task<PlatformDetailModel?> GetAsync(Guid id)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();

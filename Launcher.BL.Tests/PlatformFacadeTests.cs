@@ -103,4 +103,72 @@ public class PlatformFacadeTests : FacadeTestsBase
         // Assert - no exception should be thrown
         await action.Should().NotThrowAsync();
     }
+
+    // --- Query / Filter / Sort tests ---
+
+    [Fact]
+    public async Task Query_SearchByName_ReturnsMatchingPlatforms()
+    {
+        // Arrange - search for "Play" (should match "PlayStation 5")
+        var query = new QueryObject();
+        query.SearchTerm = "Play";
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(1);
+        resultList[0].Name.Should().Be("PlayStation 5");
+    }
+
+    [Fact]
+    public async Task Query_SortByNameAscending_ReturnsInOrder()
+    {
+        // Arrange
+        var query = new QueryObject();
+        query.SortBy = "Name";
+        query.SortDescending = false;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - alphabetical: PC, PlayStation 5, Xbox
+        var resultList = results.ToList();
+        resultList[0].Name.Should().Be("PC");
+        resultList[1].Name.Should().Be("PlayStation 5");
+        resultList[2].Name.Should().Be("Xbox");
+    }
+
+    [Fact]
+    public async Task Query_SortByNameDescending_ReturnsInReverseOrder()
+    {
+        // Arrange
+        var query = new QueryObject();
+        query.SortBy = "Name";
+        query.SortDescending = true;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - reverse alphabetical: Xbox, PlayStation 5, PC
+        var resultList = results.ToList();
+        resultList[0].Name.Should().Be("Xbox");
+        resultList[1].Name.Should().Be("PlayStation 5");
+        resultList[2].Name.Should().Be("PC");
+    }
+
+    [Fact]
+    public async Task Query_EmptyQuery_ReturnsAllPlatforms()
+    {
+        // Arrange - no search, no sort
+        var query = new QueryObject();
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - should return all 3 seeded platforms
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(3);
+    }
 }
