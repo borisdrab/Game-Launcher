@@ -1,4 +1,5 @@
 using Launcher.BL.Facades.Interfaces;
+using Launcher.BL.Helpers;
 using Launcher.BL.Mappers.Interfaces;
 using Launcher.BL.Models;
 using Launcher.DAL.Context;
@@ -38,21 +39,14 @@ public class GenreFacade
         
         IQueryable<GenreEntity> dbQuery = dbContext.Genres.AsNoTracking();
         
-        if (string.IsNullOrWhiteSpace(query.SearchTerm) == false)
+        if (QueryHelper.HasSearchTerm(query.SearchTerm))
         {
-            dbQuery = dbQuery.Where(g => g.Name.Contains(query.SearchTerm));
+            dbQuery = dbQuery.Where(g => g.Name.Contains(query.SearchTerm!));
         }
         
         if (query.SortBy == "Name")
         {
-            if (query.SortDescending)
-            {
-                dbQuery = dbQuery.OrderByDescending(g => g.Name);
-            }
-            else
-            {
-                dbQuery = dbQuery.OrderBy(g => g.Name);
-            }
+            dbQuery = QueryHelper.ApplySort(dbQuery, g => g.Name, query.SortDescending);
         }
         
         var entities = await dbQuery.ToListAsync();

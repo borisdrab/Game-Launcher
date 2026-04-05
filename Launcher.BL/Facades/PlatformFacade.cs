@@ -1,4 +1,5 @@
 using Launcher.BL.Facades.Interfaces;
+using Launcher.BL.Helpers;
 using Launcher.BL.Mappers.Interfaces;
 using Launcher.BL.Models;
 using Launcher.DAL.Context;
@@ -38,21 +39,14 @@ public class PlatformFacade
         
         IQueryable<PlatformEntity> dbQuery = dbContext.Platforms.AsNoTracking();
         
-        if (string.IsNullOrWhiteSpace(query.SearchTerm) == false)
+        if (QueryHelper.HasSearchTerm(query.SearchTerm))
         {
-            dbQuery = dbQuery.Where(p => p.Name.Contains(query.SearchTerm));
+            dbQuery = dbQuery.Where(p => p.Name.Contains(query.SearchTerm!));
         }
         
         if (query.SortBy == "Name")
         {
-            if (query.SortDescending)
-            {
-                dbQuery = dbQuery.OrderByDescending(p => p.Name);
-            }
-            else
-            {
-                dbQuery = dbQuery.OrderBy(p => p.Name);
-            }
+            dbQuery = QueryHelper.ApplySort(dbQuery, p => p.Name, query.SortDescending);
         }
         
         var entities = await dbQuery.ToListAsync();
