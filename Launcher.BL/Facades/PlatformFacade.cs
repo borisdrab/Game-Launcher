@@ -7,38 +7,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Launcher.BL.Facades;
 
-public class GenreFacade
-    : FacadeBase<GenreEntity, GenreListModel, GenreDetailModel>,
-        IGenreFacade
+public class PlatformFacade
+    : FacadeBase<PlatformEntity, PlatformListModel, PlatformDetailModel>,
+        IPlatformFacade
 {
     private readonly IDbContextFactory<LauncherDbContext> _dbContextFactory;
 
-    public GenreFacade(
-        IModelMapper<GenreEntity, GenreListModel, GenreDetailModel> mapper,
+    public PlatformFacade(
+        IModelMapper<PlatformEntity, PlatformListModel, PlatformDetailModel> mapper,
         IDbContextFactory<LauncherDbContext> dbContextFactory)
         : base(mapper)
     {
         _dbContextFactory = dbContextFactory;
     }
 
-    public override async Task<IEnumerable<GenreListModel>> GetAsync()
+    public override async Task<IEnumerable<PlatformListModel>> GetAsync()
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        var entities = await dbContext.Genres
+        var entities = await dbContext.Platforms
             .AsNoTracking()
             .ToListAsync();
 
         return _mapper.MapToListModel(entities);
     }
 
-    public override async Task<GenreDetailModel?> GetAsync(Guid id)
+    public override async Task<PlatformDetailModel?> GetAsync(Guid id)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        var entity = await dbContext.Genres
+        var entity = await dbContext.Platforms
             .AsNoTracking()
-            .FirstOrDefaultAsync(g => g.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (entity is null)
         {
@@ -48,19 +48,19 @@ public class GenreFacade
         return _mapper.MapToDetailModel(entity);
     }
 
-    public override async Task<Guid> SaveAsync(GenreDetailModel model)
+    public override async Task<Guid> SaveAsync(PlatformDetailModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
         var entity = _mapper.MapToEntity(model);
 
-        var existingEntity = await dbContext.Genres
-            .FirstOrDefaultAsync(g => g.Id == entity.Id);
+        var existingEntity = await dbContext.Platforms
+            .FirstOrDefaultAsync(p => p.Id == entity.Id);
 
         if (existingEntity is null)
         {
             entity.Id = Guid.NewGuid();
-            await dbContext.Genres.AddAsync(entity);
+            await dbContext.Platforms.AddAsync(entity);
         }
         else
         {
@@ -76,12 +76,12 @@ public class GenreFacade
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        var entity = await dbContext.Genres
-            .FirstOrDefaultAsync(g => g.Id == id);
+        var entity = await dbContext.Platforms
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (entity is not null)
         {
-            dbContext.Genres.Remove(entity);
+            dbContext.Platforms.Remove(entity);
             await dbContext.SaveChangesAsync();
         }
     }

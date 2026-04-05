@@ -7,27 +7,36 @@ public class GenreModelMapper
     : ModelMapperBase<GenreEntity, GenreListModel, GenreDetailModel>
 {
     public override GenreListModel MapToListModel(GenreEntity? entity)
-        => entity is null
-            ? GenreListModel.Empty
-            : new GenreListModel
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
+    {
+        if (entity is null)
+        {
+            return GenreListModel.Empty;
+        }
+
+        var model = new GenreListModel();
+        model.Id = entity.Id;
+        model.Name = entity.Name;
+        return model;
+    }
 
     public override GenreDetailModel MapToDetailModel(GenreEntity? entity)
-        => entity is null
-            ? GenreDetailModel.Empty
-            : new GenreDetailModel
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
+    {
+        if (entity is null)
+        {
+            return GenreDetailModel.Empty;
+        }
+
+        var model = new GenreDetailModel();
+        model.Id = entity.Id;
+        model.Name = entity.Name;
+        return model;
+    }
 
     public override GenreEntity MapToEntity(GenreDetailModel model)
-        => new()
-        {
-            Id = model.Id,
-            Name = model.Name
-        };
+    {
+        var entity = new GenreEntity();
+        entity.Id = model.Id;
+        entity.Name = model.Name;
+        return entity;
+    }
 }
