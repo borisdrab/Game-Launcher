@@ -33,7 +33,8 @@ public class UserFacade(
             ("displayname", true) => query.OrderBy(u => u.DisplayName),
             ("displayname", false) => query.OrderByDescending(u => u.DisplayName),
             ("email", true) => query.OrderBy(u => u.Email),
-            ("email", false) => query.OrderByDescending(u => u.Email)
+            ("email", false) => query.OrderByDescending(u => u.Email),
+            _ => query.OrderBy(u => u.UserName)
         };
         
         return _mapper.MapToListModel(await query.ToListAsync());
@@ -60,7 +61,10 @@ public class UserFacade(
         await ctx.SaveChangesAsync();
         return entity.Id;
     }
-    
+
     public override async Task DeleteAsync(Guid id)
-        => await userRepository.DeleteAsync(id);
+    {
+        await userRepository.DeleteAsync(id);
+        await ctx.SaveChangesAsync();
+    }
 }
