@@ -26,9 +26,9 @@ public static class PlatformSeeds
     public static DbContext SeedPlatforms(this DbContext dbx)
     {
         dbx.Set<PlatformEntity>().AddRange(
-            Pc,
-            Xbox,
-            PlayStation5
+            new PlatformEntity { Id = Pc.Id, Name = Pc.Name },
+            new PlatformEntity { Id = Xbox.Id, Name = Xbox.Name },
+            new PlatformEntity { Id = PlayStation5.Id, Name = PlayStation5.Name }
         );
 
         return dbx;

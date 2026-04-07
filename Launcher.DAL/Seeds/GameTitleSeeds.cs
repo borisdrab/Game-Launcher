@@ -34,10 +34,32 @@ public static class GameTitleSeeds
     public static DbContext SeedGameTitles(this DbContext dbx)
     {
         dbx.Set<GameTitleEntity>().AddRange(
-            TheWitcher3,
-            EldenRing
+            new GameTitleEntity
+            {
+                Id = TheWitcher3.Id,
+                Name = TheWitcher3.Name,
+                Description = TheWitcher3.Description,
+                PegiRating = TheWitcher3.PegiRating,
+                PriceCents = TheWitcher3.PriceCents,
+                ReleaseDate = TheWitcher3.ReleaseDate,
+                Publisher = TheWitcher3.Publisher,
+                IsAvailable = TheWitcher3.IsAvailable,
+                CoverImageUrl = TheWitcher3.CoverImageUrl
+            },
+            new GameTitleEntity
+            {
+                Id = EldenRing.Id,
+                Name = EldenRing.Name,
+                Description = EldenRing.Description,
+                PegiRating = EldenRing.PegiRating,
+                PriceCents = EldenRing.PriceCents,
+                ReleaseDate = EldenRing.ReleaseDate,
+                Publisher = EldenRing.Publisher,
+                IsAvailable = EldenRing.IsAvailable,
+                CoverImageUrl = EldenRing.CoverImageUrl
+            }
         );
-        
+
         return dbx;
     }
 }

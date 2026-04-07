@@ -22,10 +22,10 @@ public static class GameTitleGenreSeeds
     public static DbContext SeedGameTitleGenres(this DbContext dbx)
     {
         dbx.Set<GameTitleGenreEntity>().AddRange(
-            TheWitcher3OpenWorld,
-            TheWitcher3Rpg
+            new GameTitleGenreEntity { GameTitleId = TheWitcher3OpenWorld.GameTitleId, GenreId = TheWitcher3OpenWorld.GenreId },
+            new GameTitleGenreEntity { GameTitleId = TheWitcher3Rpg.GameTitleId, GenreId = TheWitcher3Rpg.GenreId }
         );
-        
+
         return dbx;
     }
 }

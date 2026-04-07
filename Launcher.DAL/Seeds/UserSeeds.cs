@@ -53,13 +53,13 @@ public static class UserSeeds
     public static DbContext SeedUsers(this DbContext dbx)
     {
         dbx.Set<UserEntity>().AddRange(
-            Stepan,
-            Boris,
-            Ondrej,
-            Samuel,
-            Jan
+            new UserEntity { Id = Stepan.Id, UserName = Stepan.UserName, Email = Stepan.Email, DisplayName = Stepan.DisplayName, AvatarUrl = Stepan.AvatarUrl },
+            new UserEntity { Id = Boris.Id, UserName = Boris.UserName, Email = Boris.Email, DisplayName = Boris.DisplayName, AvatarUrl = Boris.AvatarUrl },
+            new UserEntity { Id = Ondrej.Id, UserName = Ondrej.UserName, Email = Ondrej.Email, DisplayName = Ondrej.DisplayName, AvatarUrl = Ondrej.AvatarUrl },
+            new UserEntity { Id = Samuel.Id, UserName = Samuel.UserName, Email = Samuel.Email, DisplayName = Samuel.DisplayName, AvatarUrl = Samuel.AvatarUrl },
+            new UserEntity { Id = Jan.Id, UserName = Jan.UserName, Email = Jan.Email, DisplayName = Jan.DisplayName, AvatarUrl = Jan.AvatarUrl }
         );
-        
+
         return dbx;
     }
 }

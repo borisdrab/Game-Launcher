@@ -19,7 +19,14 @@ public static class LibraryTitleSeeds
     public static DbContext SeedLibraryTitles(this DbContext dbx)
     {
         dbx.Set<LibraryTitleEntity>().AddRange(
-            SchpagysCompletedEldenRing
+            new LibraryTitleEntity
+            {
+                LibraryId = SchpagysCompletedEldenRing.LibraryId,
+                GameTitleId = SchpagysCompletedEldenRing.GameTitleId,
+                AddedAt = SchpagysCompletedEldenRing.AddedAt,
+                IsFavorite = SchpagysCompletedEldenRing.IsFavorite,
+                PriceCentsAtPurchase = SchpagysCompletedEldenRing.PriceCentsAtPurchase
+            }
         );
 
         return dbx;
