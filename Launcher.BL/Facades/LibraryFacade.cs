@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Linq;
 
 namespace Launcher.BL.Facades
 {
@@ -26,14 +27,17 @@ namespace Launcher.BL.Facades
             return _mapper.MapToListModel(await query.ToListAsync());
         }
 
-        public async Task<IEnumerable<LibraryListModel>> GetByName(Guid userId, string? searchTerm, string? sortBy, bool ascending, params string[] genres)
+        public async Task<LibraryListModel> FilterAsync(Guid userId, string? gameName, string? sortBy, bool ascending, params string[] genres)
         {
             LibraryEntity userLibrary = libraryRepository.Get().Where(lib => lib.UserId == userId).Single();
 
-            var usersGames = userLibrary.LibraryTitles;
+            IEnumerable<LibraryTitleEntity>? usersGames = userLibrary.LibraryTitles
+                .Where(libTitle => libTitle.GameTitle.Name.Contains(gameName))
+                .Where(libTitle => libTitle.GameTitle.GameTitleGenres.Any(genre => genres.Contains(genre.Genre.Name)));
 
+            userLibrary.LibraryTitles = usersGames.ToList();
 
-            return _mapper.MapToListModel(await userLibrary);
+            return _mapper.MapToListModel(userLibrary);
         }
 
         public override async Task<LibraryDetailModel?> GetAsync(Guid id)
@@ -57,7 +61,7 @@ namespace Launcher.BL.Facades
             await ctx.SaveChangesAsync();
             return entity.Id;
         }
-        }
+        
 
         public override async Task DeleteAsync(Guid id)
         {
