@@ -32,8 +32,8 @@ namespace Launcher.BL.Facades
             LibraryEntity userLibrary = libraryRepository.Get().Where(lib => lib.UserId == userId).Single();
 
             IEnumerable<LibraryTitleEntity>? usersGames = userLibrary.LibraryTitles
-                .Where(libTitle => libTitle.GameTitle.Name.Contains(gameName))
-                .Where(libTitle => libTitle.GameTitle.GameTitleGenres.Any(genre => genres.Contains(genre.Genre.Name)));
+                .Where(libTitle => libTitle!.GameTitle!.Name.Contains(gameName!))
+                .Where(libTitle => libTitle!.GameTitle!.GameTitleGenres.Any(genre => genres.Contains(genre!.Genre!.Name)));
 
             userLibrary.LibraryTitles = usersGames.ToList();
 
