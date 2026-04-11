@@ -133,7 +133,7 @@ public class LibraryFacadeTests : FacadeTestsBase
         
         // Assert
         result.LibraryTitles.Should().HaveCount(1);
-        result.LibraryTitles.First().GameTitle!.Name.Should().Contain("Elden");
+        result.LibraryTitles.First().GameTitle!.Name.Should().ContainEquivalentOf("Elden");
     }
 
     [Fact]

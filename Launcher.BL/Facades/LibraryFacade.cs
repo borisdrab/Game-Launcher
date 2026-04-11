@@ -28,29 +28,31 @@ namespace Launcher.BL.Facades
                             .ThenInclude(gtg => gtg.Genre)
                 .Where(lib => lib.UserId == userId);
 
-            LibraryEntity? userLibrary = await query.SingleOrDefaultAsync();
+            LibraryEntity? userLibrary = await query.FirstOrDefaultAsync();
             if (userLibrary == null) return LibraryListModel.Empty;
 
             var filteredTitles = userLibrary.LibraryTitles.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(gameName))
             {
-                filteredTitles = filteredTitles.Where(lt => lt.GameTitle!.Name.Contains(gameName, StringComparison.OrdinalIgnoreCase));
+                filteredTitles = filteredTitles.Where(lt => lt.GameTitle?.Name.Contains(gameName, StringComparison.OrdinalIgnoreCase) == true);
             }
 
             if (genres is { Length: > 0 })
             {
-                filteredTitles = filteredTitles.Where(lt => lt.GameTitle!.GameTitleGenres.Any(gtg => genres.Contains(gtg.Genre!.Name)));
+                filteredTitles = filteredTitles.Where(lt => 
+                    lt.GameTitle?.GameTitleGenres?.Any(gtg => 
+                        gtg.Genre != null && genres.Any(g => string.Equals(g, gtg.Genre.Name, StringComparison.OrdinalIgnoreCase))) == true);
             }
 
             // Sorting
             filteredTitles = (sortBy?.ToLower(), ascending) switch
             {
-                ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle!.Name),
-                ("name", false) => filteredTitles.OrderByDescending(lt => lt.GameTitle!.Name),
+                ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty),
+                ("name", false) => filteredTitles.OrderByDescending(lt => lt.GameTitle?.Name ?? string.Empty),
                 ("addedat", true) => filteredTitles.OrderBy(lt => lt.AddedAt),
                 ("addedat", false) => filteredTitles.OrderByDescending(lt => lt.AddedAt),
-                _ => filteredTitles.OrderBy(lt => lt.GameTitle!.Name)
+                _ => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty)
             };
 
             userLibrary.LibraryTitles = filteredTitles.ToList();
