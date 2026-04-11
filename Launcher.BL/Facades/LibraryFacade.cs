@@ -1,4 +1,5 @@
-﻿using Launcher.BL.Mappers.Interfaces;
+using Launcher.BL.Facades.Interfaces;
+using Launcher.BL.Mappers.Interfaces;
 using Launcher.BL.Models;
 using Launcher.BL.Repositories;
 using Launcher.BL.Repositories.Interfaces;
@@ -7,42 +8,64 @@ using Launcher.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Launcher.BL.Facades
 {
     public class LibraryFacade(
-    LauncherDbContext ctx,
-    LibraryRepository libraryRepository,
-    IModelMapper<LibraryEntity, LibraryListModel, LibraryDetailModel> mapper)
-        : FacadeBase<LibraryEntity, LibraryListModel, LibraryDetailModel>(mapper)
+        LauncherDbContext ctx,
+        LibraryRepository libraryRepository,
+        IModelMapper<LibraryEntity, LibraryListModel, LibraryDetailModel> mapper)
+        : FacadeBase<LibraryEntity, LibraryListModel, LibraryDetailModel>(mapper), ILibraryFacade
     {
-        public async Task<IEnumerable<LibraryListModel>> GetAllAsync()
-        {
-            IQueryable<LibraryEntity> query = libraryRepository.Get();
-
-
-            return _mapper.MapToListModel(await query.ToListAsync());
-        }
-
         public async Task<LibraryListModel> FilterAsync(Guid userId, string? gameName, string? sortBy, bool ascending, params string[] genres)
         {
-            LibraryEntity userLibrary = libraryRepository.Get().Where(lib => lib.UserId == userId).Single();
+            var query = libraryRepository.Get()
+                .Include(l => l.LibraryTitles)
+                    .ThenInclude(lt => lt.GameTitle)
+                        .ThenInclude(gt => gt!.GameTitleGenres)
+                            .ThenInclude(gtg => gtg.Genre)
+                .Where(lib => lib.UserId == userId);
 
-            IEnumerable<LibraryTitleEntity>? usersGames = userLibrary.LibraryTitles
-                .Where(libTitle => libTitle!.GameTitle!.Name.Contains(gameName!))
-                .Where(libTitle => libTitle!.GameTitle!.GameTitleGenres.Any(genre => genres.Contains(genre!.Genre!.Name)));
+            LibraryEntity? userLibrary = await query.SingleOrDefaultAsync();
+            if (userLibrary == null) return LibraryListModel.Empty;
 
-            userLibrary.LibraryTitles = usersGames.ToList();
+            var filteredTitles = userLibrary.LibraryTitles.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(gameName))
+            {
+                filteredTitles = filteredTitles.Where(lt => lt.GameTitle!.Name.Contains(gameName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (genres is { Length: > 0 })
+            {
+                filteredTitles = filteredTitles.Where(lt => lt.GameTitle!.GameTitleGenres.Any(gtg => genres.Contains(gtg.Genre!.Name)));
+            }
+
+            // Sorting
+            filteredTitles = (sortBy?.ToLower(), ascending) switch
+            {
+                ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle!.Name),
+                ("name", false) => filteredTitles.OrderByDescending(lt => lt.GameTitle!.Name),
+                ("addedat", true) => filteredTitles.OrderBy(lt => lt.AddedAt),
+                ("addedat", false) => filteredTitles.OrderByDescending(lt => lt.AddedAt),
+                _ => filteredTitles.OrderBy(lt => lt.GameTitle!.Name)
+            };
+
+            userLibrary.LibraryTitles = filteredTitles.ToList();
 
             return _mapper.MapToListModel(userLibrary);
         }
 
         public override async Task<LibraryDetailModel?> GetAsync(Guid id)
         {
-            var entity = await libraryRepository.Get().FirstOrDefaultAsync(u => u.Id == id);
+            var entity = await libraryRepository.Get()
+                .Include(l => l.LibraryTitles)
+                    .ThenInclude(lt => lt.GameTitle)
+                .Include(l => l.User)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            
             return entity is null ? null : _mapper.MapToDetailModel(entity);
         }
 
@@ -61,7 +84,6 @@ namespace Launcher.BL.Facades
             await ctx.SaveChangesAsync();
             return entity.Id;
         }
-        
 
         public override async Task DeleteAsync(Guid id)
         {
@@ -70,7 +92,9 @@ namespace Launcher.BL.Facades
         }
 
         public override async Task<IEnumerable<LibraryListModel>> GetAsync()
-            => _mapper.MapToListModel(await libraryRepository.Get().ToListAsync());
-
+            => _mapper.MapToListModel(await libraryRepository.Get()
+                .Include(l => l.LibraryTitles)
+                .Include(l => l.User)
+                .ToListAsync());
     }
 }
