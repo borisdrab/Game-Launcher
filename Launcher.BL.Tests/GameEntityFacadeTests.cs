@@ -22,16 +22,20 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_ReturnsAllSeededGameTitles()
     {
+        // Act
         var gameTitles = (await _facade.GetAsync()).ToList();
 
+        //  Assert
         gameTitles.Should().HaveCount(2);
     }
 
     [Fact]
     public async Task GetAsync_ById_ReturnsCorrectDetailModel()
     {
+        // Act
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
 
+        // Assert
         gameTitle.Should().NotBeNull();
         gameTitle.Id.Should().Be(GameTitleSeeds.TheWitcher3.Id);
         gameTitle.Name.Should().Be(GameTitleSeeds.TheWitcher3.Name);
@@ -45,14 +49,17 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_ById_NonExistingId_ReturnsNull()
     {
+        // Act
         var gameTitle = await _facade.GetAsync(Guid.NewGuid());
-
+        
+        // Assert
         gameTitle.Should().BeNull();
     }
 
     [Fact]
     public async Task Save_NewGameTitle_Persisted()
     {
+        // Arrange
         var newGame = new GameTitleDetailModel
         {
             Name = "Test Game",
@@ -65,8 +72,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
             IsAvailable = true
         };
 
+        // Act
         var savedId = await _facade.SaveAsync(newGame);
 
+        // Assert
         var gameFromDb = await _facade.GetAsync(savedId);
         gameFromDb.Should().NotBeNull();
         gameFromDb.Name.Should().Be("Test Game");
@@ -78,6 +87,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task Save_UpdateExistingGameTitle_ChangesPersisted()
     {
+        // Arrange
         var gameToUpdate = new GameTitleDetailModel
         {
             Id = GameTitleSeeds.EldenRing.Id,
@@ -91,8 +101,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
             IsAvailable = false
         };
 
+        // Act
         await _facade.SaveAsync(gameToUpdate);
 
+        // Assert
         var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         updated.Should().NotBeNull();
         updated.Description.Should().Be("Updated description");
@@ -103,6 +115,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task Delete_ExistingGameTitle_Removed()
     {
+        // Arrange
         var newGame = new GameTitleDetailModel
         {
             Name = "ToDelete",
@@ -117,8 +130,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
 
         var savedId = await _facade.SaveAsync(newGame);
 
+        // Act
         await _facade.DeleteAsync(savedId);
 
+        // Assert
         var deleted = await _facade.GetAsync(savedId);
         deleted.Should().BeNull();
     }
@@ -126,8 +141,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_SearchByName_ReturnsOnlyMatching()
     {
+        // Act
         var results = (await _facade.GetAsync("Witcher", null, null, null, null, false)).ToList();
 
+        // Assert
         results.Should().HaveCount(1);
         results[0].Name.Should().Be(GameTitleSeeds.TheWitcher3.Name);
     }
@@ -135,8 +152,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_FilterByPegiRating_ReturnsOnlyMatching()
     {
+        // Act
         var results = (await _facade.GetAsync(null, 16, null, null, null, false)).ToList();
 
+        // Assert
         results.Should().HaveCount(1);
         results[0].Id.Should().Be(GameTitleSeeds.EldenRing.Id);
         results[0].PegiRating.Should().Be(16);
@@ -145,8 +164,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_FilterByAvailability_ReturnsOnlyMatching()
     {
+        // Act
         var results = (await _facade.GetAsync(null, null, true, null, null, false)).ToList();
 
+        // Assert
         results.Should().HaveCount(2);
         results.Should().OnlyContain(x => x.IsAvailable);
     }
@@ -154,8 +175,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_FilterByPublisher_ReturnsOnlyMatching()
     {
+        // Act
         var results = (await _facade.GetAsync(null, null, null, "CD PROJECT", null, false)).ToList();
 
+        // Assert
         results.Should().HaveCount(1);
         results[0].Id.Should().Be(GameTitleSeeds.TheWitcher3.Id);
     }
@@ -163,30 +186,35 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_SortByName_ReturnsOrdered()
     {
+        // Act
         var results = (await _facade.GetAsync(null, null, null, null, GameTitleSortBy.Name, false)).ToList();
 
+        // Assert
         results.Select(x => x.Name).Should().BeInAscendingOrder();
     }
 
     [Fact]
     public async Task GetAsync_SortByPriceCents_ReturnsOrdered()
     {
+        // Act
         var results = (await _facade.GetAsync(null, null, null, null, GameTitleSortBy.PriceCents, false)).ToList();
 
+        // Assert
         results.Select(x => x.PriceCents).Should().BeInAscendingOrder();
     }
 
     [Fact]
     public async Task GetAsync_ById_ReturnsGenresPlatformsAchievementsReviews()
     {
+        // Act
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
 
+        // Assert
         gameTitle.Should().NotBeNull();
         gameTitle.Genres.Should().NotBeNull();
         gameTitle.Platforms.Should().NotBeNull();
         gameTitle.Achievements.Should().NotBeNull();
         gameTitle.Reviews.Should().NotBeNull();
-
         gameTitle.Genres.Should().Contain(x => x.Id == GenreSeeds.OpenWorld.Id);
         gameTitle.Genres.Should().Contain(x => x.Id == GenreSeeds.Rpg.Id);
     }
@@ -194,8 +222,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_ById_ReturnsAverageRatingAndCounts()
     {
+        // Act
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
 
+        // Assert
         gameTitle.Should().NotBeNull();
         gameTitle.AchievementCount.Should().Be(gameTitle.Achievements.Count);
         gameTitle.ReviewCount.Should().Be(gameTitle.Reviews.Count);
@@ -209,6 +239,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_QueryObject_SearchAndSort_Works()
     {
+        // Arrange
         var query = new QueryObject
         {
             SearchTerm = "Witcher",
@@ -216,8 +247,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
             SortDescending = false
         };
 
+        // Act
         var results = (await _facade.GetAsync(query)).ToList();
 
+        // Assert
         results.Should().HaveCount(1);
         results[0].Id.Should().Be(GameTitleSeeds.TheWitcher3.Id);
         results[0].Name.Should().Be(GameTitleSeeds.TheWitcher3.Name);
@@ -226,8 +259,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task AddGenreAsync_AddsRelation()
     {
+        // Act
         await _facade.AddGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Genres.Should().Contain(x => x.Id == GenreSeeds.ActionRpg.Id);
@@ -236,10 +271,13 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task RemoveGenreAsync_RemovesRelation()
     {
+        // Arrange
         await _facade.AddGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
 
+        // Act
         await _facade.RemoveGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Genres.Should().NotContain(x => x.Id == GenreSeeds.ActionRpg.Id);
@@ -248,8 +286,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task AddPlatformAsync_AddsRelation()
     {
+        // Act
         await _facade.AddPlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Platforms.Should().Contain(x => x.Id == PlatformSeeds.PlayStation5.Id);
@@ -258,10 +298,13 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task RemovePlatformAsync_RemovesRelation()
     {
+        // Arrange
         await _facade.AddPlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
 
+        // Act
         await _facade.RemovePlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Platforms.Should().NotContain(x => x.Id == PlatformSeeds.PlayStation5.Id);
@@ -270,6 +313,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task AddAchievementAsync_AddsAchievement()
     {
+        // Arrange
         var achievement = new AchievementDetailModel
         {
             Id = Guid.NewGuid(),
@@ -278,8 +322,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
             Points = 25
         };
 
+        // Act
         await _facade.AddAchievementAsync(GameTitleSeeds.EldenRing.Id, achievement);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Achievements.Should().Contain(x => x.Name == "Test Achievement");
@@ -288,6 +334,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task UpdateAchievementAsync_UpdatesAchievement()
     {
+        // Arrange
         var newAchievement = new AchievementDetailModel
         {
             Id = Guid.NewGuid(),
@@ -295,7 +342,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
             Description = "Remove me",
             Points = 15
         };
-
+        
         await _facade.AddAchievementAsync(GameTitleSeeds.EldenRing.Id, newAchievement);
         
         var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
@@ -307,8 +354,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
         achievement.Description = "Updated Achievement Description";
         achievement.Points = 99;
 
+        // Act
         await _facade.UpdateAchievementAsync(GameTitleSeeds.EldenRing.Id, achievement);
 
+        // Assert
         var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         updated.Should().NotBeNull();
         updated.Achievements.Should().Contain(x =>
@@ -321,6 +370,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task RemoveAchievementAsync_RemovesAchievement()
     {
+        // Arrange
         var newAchievement = new AchievementDetailModel
         {
             Id = Guid.NewGuid(),
@@ -337,8 +387,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
 
         var achievementId = existing.Achievements.First().Id;
 
+        // Act
         await _facade.RemoveAchievementAsync(achievementId);
 
+        // Assert
         var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         updated.Should().NotBeNull();
         updated.Achievements.Should().NotContain(x => x.Id == achievementId);
@@ -347,6 +399,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task AddReviewAsync_AddsReview()
     {
+        // Arrange
         var review = new ReviewDetailModel
         {
             UserId = UserSeeds.Boris.Id,
@@ -355,8 +408,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
             CreatedAt = DateTime.UtcNow
         };
 
+        // Act
         await _facade.AddReviewAsync(GameTitleSeeds.TheWitcher3.Id, review);
 
+        // Assert
         var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
         gameTitle.Should().NotBeNull();
         gameTitle.Reviews.Should().Contain(x => x.Text == "Very good game");
@@ -365,6 +420,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task UpdateReviewAsync_UpdatesReview()
     {
+        // Arrange
         var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         existing.Should().NotBeNull();
         existing.Reviews.Should().NotBeEmpty();
@@ -374,8 +430,10 @@ public class GameTitleFacadeTests : FacadeTestsBase
         review.Rating = 3;
         review.UpdatedAt = DateTime.UtcNow;
 
+        // Act
         await _facade.UpdateReviewAsync(GameTitleSeeds.EldenRing.Id, review);
 
+        // Assert
         var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         updated.Should().NotBeNull();
         updated.Reviews.Should().Contain(x =>
@@ -387,14 +445,17 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task RemoveReviewAsync_RemovesReview()
     {
+        // Arrange
         var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         existing.Should().NotBeNull();
         existing.Reviews.Should().NotBeEmpty();
 
         var reviewId = existing.Reviews.First().Id;
 
+        // Act
         await _facade.RemoveReviewAsync(reviewId);
 
+        // Assert
         var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
         updated.Should().NotBeNull();
         updated.Reviews.Should().NotContain(x => x.Id == reviewId);
