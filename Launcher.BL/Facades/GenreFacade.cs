@@ -33,7 +33,7 @@ public class GenreFacade
         return _mapper.MapToListModel(entities);
     }
 
-    public override async Task<IEnumerable<GenreListModel>> GetAsync(QueryObject query)
+    public async Task<IEnumerable<GenreListModel>> GetAsync(QueryObject query)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         

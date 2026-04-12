@@ -32,11 +32,6 @@ public class GameTitleFacade(
                 .ToListAsync());
     }
 
-    public override async Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
-    {
-        return await Task.FromResult(Enumerable.Empty<GameTitleListModel>());
-    }
-    
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
     {
         GameTitleEntity? entity = await gameTitleRepository

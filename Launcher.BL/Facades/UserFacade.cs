@@ -40,11 +40,6 @@ public class UserFacade(
         return _mapper.MapToListModel(await query.ToListAsync());
     }
 
-    public override async Task<IEnumerable<UserListModel>> GetAsync(QueryObject query)
-    {
-        return await Task.FromResult(Enumerable.Empty<UserListModel>());
-    }
-    
     public override async Task<UserDetailModel?> GetAsync(Guid id)
     {
         var entity = await userRepository.Get().FirstOrDefaultAsync(u => u.Id == id);

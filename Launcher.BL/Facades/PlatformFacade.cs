@@ -33,7 +33,7 @@ public class PlatformFacade
         return _mapper.MapToListModel(entities);
     }
 
-    public override async Task<IEnumerable<PlatformListModel>> GetAsync(QueryObject query)
+    public async Task<IEnumerable<PlatformListModel>> GetAsync(QueryObject query)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         

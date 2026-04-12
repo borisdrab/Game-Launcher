@@ -33,7 +33,7 @@ public class ReviewFacade
         return _mapper.MapToListModel(entities);
     }
 
-    public override async Task<IEnumerable<ReviewListModel>> GetAsync(QueryObject query)
+    public async Task<IEnumerable<ReviewListModel>> GetAsync(QueryObject query)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 

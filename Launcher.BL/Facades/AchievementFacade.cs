@@ -33,7 +33,7 @@ public class AchievementFacade
         return _mapper.MapToListModel(entities);
     }
 
-    public override async Task<IEnumerable<AchievementListModel>> GetAsync(QueryObject query)
+    public async Task<IEnumerable<AchievementListModel>> GetAsync(QueryObject query)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
