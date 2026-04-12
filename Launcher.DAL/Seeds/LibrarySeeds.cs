@@ -23,8 +23,8 @@ public static class LibrarySeeds
     public static DbContext SeedLibraries(this DbContext dbx)
     {
         dbx.Set<LibraryEntity>().AddRange(
-            SchpagysCompleted,
-            BorissFavourite
+            new LibraryEntity { Id = SchpagysCompleted.Id, Name = SchpagysCompleted.Name, UserId = SchpagysCompleted.UserId },
+            new LibraryEntity { Id = BorissFavourite.Id, Name = BorissFavourite.Name, UserId = BorissFavourite.UserId }
         );
 
         return dbx;

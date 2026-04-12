@@ -22,10 +22,10 @@ public static class GameTitlePlatformSeeds
     public static DbContext SeedGameTitlePlatforms(this DbContext dbx)
     {
         dbx.Set<GameTitlePlatformEntity>().AddRange(
-            EldenRingPc,
-            EldenRingXbox
+            new GameTitlePlatformEntity { GameTitleId = EldenRingPc.GameTitleId, PlatformId = EldenRingPc.PlatformId },
+            new GameTitlePlatformEntity { GameTitleId = EldenRingXbox.GameTitleId, PlatformId = EldenRingXbox.PlatformId }
         );
-        
+
         return dbx;
     }
 }

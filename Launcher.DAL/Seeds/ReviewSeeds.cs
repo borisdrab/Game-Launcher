@@ -19,7 +19,14 @@ public static class ReviewSeeds
     public static DbContext SeedReviews(this DbContext dbx)
     {
         dbx.Set<ReviewEntity>().AddRange(
-            StepansEldenRingReview
+            new ReviewEntity
+            {
+                Id = StepansEldenRingReview.Id,
+                UserId = StepansEldenRingReview.UserId,
+                GameTitleId = StepansEldenRingReview.GameTitleId,
+                Rating = StepansEldenRingReview.Rating,
+                CreatedAt = StepansEldenRingReview.CreatedAt
+            }
         );
 
         return dbx;

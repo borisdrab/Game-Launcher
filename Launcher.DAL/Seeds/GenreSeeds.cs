@@ -38,13 +38,13 @@ public static class GenreSeeds
     public static DbContext SeedGenres(this DbContext dbx)
     {
         dbx.Set<GenreEntity>().AddRange(
-            ActionRpg,
-            FirstPersonShooter,
-            Mmorpg,
-            OpenWorld,
-            Rpg
+            new GenreEntity { Id = ActionRpg.Id, Name = ActionRpg.Name },
+            new GenreEntity { Id = FirstPersonShooter.Id, Name = FirstPersonShooter.Name },
+            new GenreEntity { Id = Mmorpg.Id, Name = Mmorpg.Name },
+            new GenreEntity { Id = OpenWorld.Id, Name = OpenWorld.Name },
+            new GenreEntity { Id = Rpg.Id, Name = Rpg.Name }
         );
-        
+
         return dbx;
     }
 }
