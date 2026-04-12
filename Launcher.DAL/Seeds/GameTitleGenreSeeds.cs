@@ -19,11 +19,18 @@ public static class GameTitleGenreSeeds
         GenreId = Rpg.Id,
     };
 
+    public static readonly GameTitleGenreEntity EldenRingRpg = new()
+    {
+        GameTitleId = EldenRing.Id,
+        GenreId = Rpg.Id,
+    };
+
     public static DbContext SeedGameTitleGenres(this DbContext dbx)
     {
         dbx.Set<GameTitleGenreEntity>().AddRange(
             new GameTitleGenreEntity { GameTitleId = TheWitcher3OpenWorld.GameTitleId, GenreId = TheWitcher3OpenWorld.GenreId },
-            new GameTitleGenreEntity { GameTitleId = TheWitcher3Rpg.GameTitleId, GenreId = TheWitcher3Rpg.GenreId }
+            new GameTitleGenreEntity { GameTitleId = TheWitcher3Rpg.GameTitleId, GenreId = TheWitcher3Rpg.GenreId },
+            new GameTitleGenreEntity { GameTitleId = EldenRingRpg.GameTitleId, GenreId = EldenRingRpg.GenreId }
         );
 
         return dbx;

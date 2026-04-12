@@ -1,6 +1,6 @@
 namespace Launcher.DAL.Entities;
 
-public class LibraryEntity
+public class LibraryEntity : IEntity
 {
     public Guid Id { get; set; }
 
