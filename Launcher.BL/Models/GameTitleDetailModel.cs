@@ -15,10 +15,10 @@ public class GameTitleDetailModel : ModelBase
     public DateTime? ReleaseDate { get; set; }
     public bool IsAvailable { get; set; }
     
-    public List<GenreModel> Genres { get; set; } = new();
-    public List<PlatformModel> Platforms { get; set; } = new();
-    public List<AchievementModel> Achievements { get; set; } = new();
-    public List<ReviewModel> Reviews { get; set; } = new();
+    public List<GenreDetailModel> Genres { get; set; } = new();
+    public List<PlatformDetailModel> Platforms { get; set; } = new();
+    public List<AchievementDetailModel> Achievements { get; set; } = new();
+    public List<ReviewDetailModel> Reviews { get; set; } = new();
 
     public int AchievementCount { get; set; }
     public int ReviewCount { get; set; }

@@ -38,7 +38,7 @@ public class GameTitleModelMapper
                 
                 Genres = entity.GameTitleGenres
                     .Where(x => x.Genre is not null)
-                    .Select(x => new GenreModel
+                    .Select(x => new GenreDetailModel
                     {
                         Id = x.Genre!.Id,
                         Name = x.Genre.Name
@@ -48,7 +48,7 @@ public class GameTitleModelMapper
 
                 Platforms = entity.GameTitlePlatforms
                     .Where(x => x.Platform is not null)
-                    .Select(x => new PlatformModel
+                    .Select(x => new PlatformDetailModel
                     {
                         Id = x.Platform!.Id,
                         Name = x.Platform.Name
@@ -57,23 +57,18 @@ public class GameTitleModelMapper
                     .ToList(),
 
                 Achievements = entity.Achievements
-                    .Select(x => new AchievementModel
+                    .Select(x => new AchievementDetailModel
                     {
                         Id = x.Id,
                         Name = x.Name,
                         Description = x.Description,
-                        Points = x.Points,
-                        UserAchievementCount = x.UserAchievements.Count,
-                        CompletedUsersCount = x.UserAchievements.Count(ua => ua.ProgressPercentage == 100),
-                        AverageProgressPercentage = x.UserAchievements.Count == 0
-                            ? 0
-                            : x.UserAchievements.Average(ua => ua.ProgressPercentage)
+                        Points = x.Points
                     })
                     .OrderBy(x => x.Name)
                     .ToList(),
 
                 Reviews = entity.Reviews
-                    .Select(x => new ReviewModel
+                    .Select(x => new ReviewDetailModel
                     {
                         Id = x.Id,
                         UserId = x.UserId,
@@ -124,7 +119,7 @@ public class GameTitleModelMapper
             Platform = null!
         };
 
-    public AchievementEntity MapAchievementToEntity(AchievementModel model, Guid gameTitleId)
+    public AchievementEntity MapAchievementToEntity(AchievementDetailModel model, Guid gameTitleId)
         => new()
         {
             Id = model.Id,
@@ -135,7 +130,7 @@ public class GameTitleModelMapper
             GameTitle = null!
         };
 
-    public ReviewEntity MapReviewToEntity(ReviewModel model, Guid gameTitleId)
+    public ReviewEntity MapReviewToEntity(ReviewDetailModel model, Guid gameTitleId)
         => new()
         {
             Id = model.Id,

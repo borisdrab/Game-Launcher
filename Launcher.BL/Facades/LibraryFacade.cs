@@ -71,6 +71,11 @@ namespace Launcher.BL.Facades
             return entity is null ? null : _mapper.MapToDetailModel(entity);
         }
 
+        public override async Task<IEnumerable<LibraryListModel>> GetAsync(QueryObject query)
+        {
+            return await Task.FromResult(Enumerable.Empty<LibraryListModel>());
+        }
+        
         public override async Task<Guid> SaveAsync(LibraryDetailModel detailModel)
         {
             var entity = _mapper.MapToEntity(detailModel);

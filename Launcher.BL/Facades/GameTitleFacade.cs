@@ -32,6 +32,11 @@ public class GameTitleFacade(
                 .ToListAsync());
     }
 
+    public override async Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
+    {
+        return await Task.FromResult(Enumerable.Empty<GameTitleListModel>());
+    }
+    
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
     {
         GameTitleEntity? entity = await gameTitleRepository
@@ -149,7 +154,7 @@ public class GameTitleFacade(
         await ctx.SaveChangesAsync();
     }
 
-    public async Task AddAchievementAsync(Guid gameTitleId, AchievementModel model)
+    public async Task AddAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
     {
         GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
 
@@ -165,11 +170,13 @@ public class GameTitleFacade(
             achievement.Id = Guid.NewGuid();
         }
 
+        achievement.GameTitleId = gameTitleId;
+        
         entity.Achievements.Add(achievement);
         await ctx.SaveChangesAsync();
     }
 
-    public async Task UpdateAchievementAsync(Guid gameTitleId, AchievementModel model)
+    public async Task UpdateAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
     {
         AchievementEntity? existingAchievement = await gameTitleRepository.GetAchievementByIdAsync(model.Id);
 
@@ -198,7 +205,7 @@ public class GameTitleFacade(
         await ctx.SaveChangesAsync();
     }
 
-    public async Task AddReviewAsync(Guid gameTitleId, ReviewModel model)
+    public async Task AddReviewAsync(Guid gameTitleId, ReviewDetailModel model)
     {
         GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
 
@@ -218,7 +225,7 @@ public class GameTitleFacade(
         await ctx.SaveChangesAsync();
     }
 
-    public async Task UpdateReviewAsync(Guid gameTitleId, ReviewModel model)
+    public async Task UpdateReviewAsync(Guid gameTitleId, ReviewDetailModel model)
     {
         ReviewEntity? existingReview = await gameTitleRepository.GetReviewByIdAsync(model.Id);
 

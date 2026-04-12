@@ -20,11 +20,11 @@ public interface IGameTitleFacade
     Task AddPlatformAsync(Guid gameTitleId, Guid platformId);
     Task RemovePlatformAsync(Guid gameTitleId, Guid platformId);
 
-    Task AddAchievementAsync(Guid gameTitleId, AchievementModel model);
-    Task UpdateAchievementAsync(Guid gameTitleId, AchievementModel model);
+    Task AddAchievementAsync(Guid gameTitleId, AchievementDetailModel model);
+    Task UpdateAchievementAsync(Guid gameTitleId, AchievementDetailModel model);
     Task RemoveAchievementAsync(Guid achievementId);
 
-    Task AddReviewAsync(Guid gameTitleId, ReviewModel model);
-    Task UpdateReviewAsync(Guid gameTitleId, ReviewModel model);
+    Task AddReviewAsync(Guid gameTitleId, ReviewDetailModel model);
+    Task UpdateReviewAsync(Guid gameTitleId, ReviewDetailModel model);
     Task RemoveReviewAsync(Guid reviewId);
 }
