@@ -1,4 +1,5 @@
 using Launcher.BL.Mappers.Interfaces;
+using Launcher.BL.Models;
 using Launcher.BL.Facades.Interfaces;
 
 namespace Launcher.BL.Facades;
@@ -15,6 +16,8 @@ public abstract class FacadeBase<TEntity, TListModel, TDetailModel>
     }
 
     public abstract Task<IEnumerable<TListModel>> GetAsync();
+
+    public abstract Task<IEnumerable<TListModel>> GetAsync(QueryObject query);
 
     public abstract Task<TDetailModel?> GetAsync(Guid id);
 
