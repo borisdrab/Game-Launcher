@@ -32,6 +32,26 @@ public class GameTitleFacade(
                 .ToListAsync());
     }
 
+    public Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
+    {
+        GameTitleSortBy? sortBy = query.SortBy?.ToLower() switch
+        {
+            "name" => GameTitleSortBy.Name,
+            "pegirating" => GameTitleSortBy.PegiRating,
+            "pricecents" => GameTitleSortBy.PriceCents,
+            "releasedate" => GameTitleSortBy.ReleaseDate,
+            _ => null
+        };
+
+        return GetAsync(
+            query.SearchTerm,
+            null,
+            null,
+            null,
+            sortBy,
+            query.SortDescending);
+    }
+
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
     {
         GameTitleEntity? entity = await gameTitleRepository
@@ -151,9 +171,9 @@ public class GameTitleFacade(
 
     public async Task AddAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
     {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
+        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
 
-        if (entity is null)
+        if (!exists)
         {
             throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
         }
@@ -165,9 +185,7 @@ public class GameTitleFacade(
             achievement.Id = Guid.NewGuid();
         }
 
-        achievement.GameTitleId = gameTitleId;
-        
-        entity.Achievements.Add(achievement);
+        ctx.Achievements.Add(achievement);
         await ctx.SaveChangesAsync();
     }
 
@@ -202,9 +220,9 @@ public class GameTitleFacade(
 
     public async Task AddReviewAsync(Guid gameTitleId, ReviewDetailModel model)
     {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
+        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
 
-        if (entity is null)
+        if (!exists)
         {
             throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
         }
@@ -216,7 +234,7 @@ public class GameTitleFacade(
             review.Id = Guid.NewGuid();
         }
 
-        entity.Reviews.Add(review);
+        ctx.Reviews.Add(review);
         await ctx.SaveChangesAsync();
     }
 
