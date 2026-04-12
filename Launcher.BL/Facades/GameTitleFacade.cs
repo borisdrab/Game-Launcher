@@ -39,7 +39,7 @@ public class GameTitleFacade(
             "name" => GameTitleSortBy.Name,
             "pegirating" => GameTitleSortBy.PegiRating,
             "pricecents" => GameTitleSortBy.PriceCents,
-            "releasedate" => GameTitleSortBy.ReleaseDate
+            "releasedate" => GameTitleSortBy.ReleaseDate,
             _ => null
         };
 
