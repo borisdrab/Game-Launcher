@@ -32,9 +32,24 @@ public class GameTitleFacade(
                 .ToListAsync());
     }
 
-    public override async Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
+    public override Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
     {
-        return await Task.FromResult(Enumerable.Empty<GameTitleListModel>());
+        GameTitleSortBy? sortBy = query.SortBy?.ToLower() switch
+        {
+            "name" => GameTitleSortBy.Name,
+            "pegirating" => GameTitleSortBy.PegiRating,
+            "pricecents" => GameTitleSortBy.PriceCents,
+            "releasedate" => GameTitleSortBy.ReleaseDate
+            _ => null
+        };
+
+        return GetAsync(
+            query.SearchTerm,
+            null,
+            null,
+            null,
+            sortBy,
+            query.SortDescending);
     }
     
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
