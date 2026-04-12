@@ -156,9 +156,9 @@ public class GameTitleFacade(
 
     public async Task AddAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
     {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
+        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
 
-        if (entity is null)
+        if (!exists)
         {
             throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
         }
@@ -170,9 +170,7 @@ public class GameTitleFacade(
             achievement.Id = Guid.NewGuid();
         }
 
-        achievement.GameTitleId = gameTitleId;
-        
-        entity.Achievements.Add(achievement);
+        ctx.Achievements.Add(achievement);
         await ctx.SaveChangesAsync();
     }
 
@@ -207,9 +205,9 @@ public class GameTitleFacade(
 
     public async Task AddReviewAsync(Guid gameTitleId, ReviewDetailModel model)
     {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
+        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
 
-        if (entity is null)
+        if (!exists)
         {
             throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
         }
@@ -221,7 +219,7 @@ public class GameTitleFacade(
             review.Id = Guid.NewGuid();
         }
 
-        entity.Reviews.Add(review);
+        ctx.Reviews.Add(review);
         await ctx.SaveChangesAsync();
     }
 
