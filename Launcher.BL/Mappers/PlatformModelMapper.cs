@@ -7,36 +7,27 @@ public class PlatformModelMapper
     : ModelMapperBase<PlatformEntity, PlatformListModel, PlatformDetailModel>
 {
     public override PlatformListModel MapToListModel(PlatformEntity? entity)
-    {
-        if (entity is null)
-        {
-            return PlatformListModel.Empty;
-        }
-
-        var model = new PlatformListModel();
-        model.Id = entity.Id;
-        model.Name = entity.Name;
-        return model;
-    }
+        => entity is null
+            ? PlatformListModel.Empty
+            : new PlatformListModel
+            {
+                Id = entity.Id,
+                Name = entity.Name
+            };
 
     public override PlatformDetailModel MapToDetailModel(PlatformEntity? entity)
-    {
-        if (entity is null)
-        {
-            return PlatformDetailModel.Empty;
-        }
-
-        var model = new PlatformDetailModel();
-        model.Id = entity.Id;
-        model.Name = entity.Name;
-        return model;
-    }
+        => entity is null
+            ? PlatformDetailModel.Empty
+            : new PlatformDetailModel
+            {
+                Id = entity.Id,
+                Name = entity.Name
+            };
 
     public override PlatformEntity MapToEntity(PlatformDetailModel model)
-    {
-        var entity = new PlatformEntity();
-        entity.Id = model.Id;
-        entity.Name = model.Name;
-        return entity;
-    }
+        => new()
+        {
+            Id = model.Id,
+            Name = model.Name
+        };
 }

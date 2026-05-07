@@ -23,9 +23,9 @@ public class ReviewFacadeTests : FacadeTestsBase
         // Act
         var reviews = await _facade.GetAsync();
 
-        // Assert - there is 1 seeded review (Elden Ring review)
+        // Assert - there are 3 seeded reviews
         var reviewList = reviews.ToList();
-        reviewList.Should().HaveCount(1);
+        reviewList.Should().HaveCount(3);
     }
 
     [Fact]
@@ -44,9 +44,9 @@ public class ReviewFacadeTests : FacadeTestsBase
     [Fact]
     public async Task Save_NewReview_Persisted()
     {
-        // Arrange - Boris writes a review for The Witcher 3
+        // Arrange - Stepan writes a review for The Witcher 3
         var newReview = new ReviewDetailModel();
-        newReview.UserId = UserSeeds.Boris.Id;
+        newReview.UserId = UserSeeds.Stepan.Id;
         newReview.GameTitleId = GameTitleSeeds.TheWitcher3.Id;
         newReview.Rating = 4;
         newReview.Text = "Great game!";
@@ -97,13 +97,7 @@ public class ReviewFacadeTests : FacadeTestsBase
     [Fact]
     public async Task Query_SortByRatingDescending_HighestFirst()
     {
-        // Arrange - add a second review so we can test sorting
-        var secondReview = new ReviewDetailModel();
-        secondReview.UserId = UserSeeds.Boris.Id;
-        secondReview.GameTitleId = GameTitleSeeds.TheWitcher3.Id;
-        secondReview.Rating = 2;
-        await _facade.SaveAsync(secondReview);
-
+        // Arrange - use seeded reviews (ratings: 5, 4, 2)
         var query = new QueryObject();
         query.SortBy = "Rating";
         query.SortDescending = true;
@@ -111,10 +105,48 @@ public class ReviewFacadeTests : FacadeTestsBase
         // Act
         var results = await _facade.GetAsync(query);
 
-        // Assert - rating 5 should come before rating 2
+        // Assert - ratings should be sorted: 5, 4, 2
         var resultList = results.ToList();
-        resultList.Should().HaveCount(2);
+        resultList.Should().HaveCount(3);
         resultList[0].Rating.Should().Be(5);
-        resultList[1].Rating.Should().Be(2);
+        resultList[1].Rating.Should().Be(4);
+        resultList[2].Rating.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Query_SortByRatingAscending_LowestFirst()
+    {
+        // Arrange - use seeded reviews (ratings: 5, 4, 2)
+        var query = new QueryObject();
+        query.SortBy = "Rating";
+        query.SortDescending = false;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - ratings should be sorted: 2, 4, 5
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(3);
+        resultList[0].Rating.Should().Be(2);
+        resultList[1].Rating.Should().Be(4);
+        resultList[2].Rating.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task Query_SortByDateDescending_NewestFirst()
+    {
+        // Arrange - seeded dates: 2026-01-10, 2026-02-15, 2026-03-20
+        var query = new QueryObject();
+        query.SortBy = "CreatedAt";
+        query.SortDescending = true;
+
+        // Act
+        var results = await _facade.GetAsync(query);
+
+        // Assert - newest review (March) should be first
+        var resultList = results.ToList();
+        resultList.Should().HaveCount(3);
+        resultList[0].CreatedAt.Should().Be(new DateTime(2026, 3, 20));
+        resultList[2].CreatedAt.Should().Be(new DateTime(2026, 1, 10));
     }
 }
