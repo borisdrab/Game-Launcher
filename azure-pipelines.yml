@@ -21,7 +21,7 @@ steps:
 - script: dotnet restore
   displayName: 'Restore NuGet packages'
 
-- script: dotnet build --configuration $(buildConfiguration) --no-restore
+- script: dotnet build --configuration $(buildConfiguration)
   displayName: 'Build project ($(buildConfiguration))'
 
 - script: dotnet test --configuration $(buildConfiguration) --no-build --logger trx --results-directory $(Build.SourcesDirectory)/TestResults
