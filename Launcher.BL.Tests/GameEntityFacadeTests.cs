@@ -175,8 +175,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_FilterByPublisher_ReturnsOnlyMatching()
     {
-        // Act
-        var results = (await _facade.GetAsync(null, null, null, "CD PROJECT", null, false)).ToList();
+        var results = (await _facade.GetAsync(null, null, null, "CD PROJECT RED", null, false)).ToList();
 
         // Assert
         results.Should().HaveCount(1);
@@ -229,13 +228,11 @@ public class GameTitleFacadeTests : FacadeTestsBase
         gameTitle.Should().NotBeNull();
         gameTitle.AchievementCount.Should().Be(gameTitle.Achievements.Count);
         gameTitle.ReviewCount.Should().Be(gameTitle.Reviews.Count);
-
-        if (gameTitle.Reviews.Count > 0)
-        {
-            gameTitle.AverageRating.Should().NotBeNull();
-        }
+        gameTitle.Reviews.Should().NotBeEmpty();
+        gameTitle.AverageRating.Should().NotBeNull();
+        gameTitle.AverageRating.Should().Be(gameTitle.Reviews.Average(x => x.Rating));
     }
-    
+
     [Fact]
     public async Task GetAsync_QueryObject_SearchAndSort_Works()
     {
@@ -254,210 +251,5 @@ public class GameTitleFacadeTests : FacadeTestsBase
         results.Should().HaveCount(1);
         results[0].Id.Should().Be(GameTitleSeeds.TheWitcher3.Id);
         results[0].Name.Should().Be(GameTitleSeeds.TheWitcher3.Name);
-    }
-
-    [Fact]
-    public async Task AddGenreAsync_AddsRelation()
-    {
-        // Act
-        await _facade.AddGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Genres.Should().Contain(x => x.Id == GenreSeeds.ActionRpg.Id);
-    }
-
-    [Fact]
-    public async Task RemoveGenreAsync_RemovesRelation()
-    {
-        // Arrange
-        await _facade.AddGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
-
-        // Act
-        await _facade.RemoveGenreAsync(GameTitleSeeds.EldenRing.Id, GenreSeeds.ActionRpg.Id);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Genres.Should().NotContain(x => x.Id == GenreSeeds.ActionRpg.Id);
-    }
-
-    [Fact]
-    public async Task AddPlatformAsync_AddsRelation()
-    {
-        // Act
-        await _facade.AddPlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Platforms.Should().Contain(x => x.Id == PlatformSeeds.PlayStation5.Id);
-    }
-
-    [Fact]
-    public async Task RemovePlatformAsync_RemovesRelation()
-    {
-        // Arrange
-        await _facade.AddPlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
-
-        // Act
-        await _facade.RemovePlatformAsync(GameTitleSeeds.TheWitcher3.Id, PlatformSeeds.PlayStation5.Id);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Platforms.Should().NotContain(x => x.Id == PlatformSeeds.PlayStation5.Id);
-    }
-
-    [Fact]
-    public async Task AddAchievementAsync_AddsAchievement()
-    {
-        // Arrange
-        var achievement = new AchievementDetailModel
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Achievement",
-            Description = "Achievement Description",
-            Points = 25
-        };
-
-        // Act
-        await _facade.AddAchievementAsync(GameTitleSeeds.EldenRing.Id, achievement);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Achievements.Should().Contain(x => x.Name == "Test Achievement");
-    }
-    
-    [Fact]
-    public async Task UpdateAchievementAsync_UpdatesAchievement()
-    {
-        // Arrange
-        var newAchievement = new AchievementDetailModel
-        {
-            Id = Guid.NewGuid(),
-            Name = "Achievement To Remove",
-            Description = "Remove me",
-            Points = 15
-        };
-        
-        await _facade.AddAchievementAsync(GameTitleSeeds.EldenRing.Id, newAchievement);
-        
-        var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        existing.Should().NotBeNull();
-        existing.Achievements.Should().NotBeEmpty();
-
-        var achievement = existing.Achievements.First();
-        achievement.Name = "Updated Achievement Name";
-        achievement.Description = "Updated Achievement Description";
-        achievement.Points = 99;
-
-        // Act
-        await _facade.UpdateAchievementAsync(GameTitleSeeds.EldenRing.Id, achievement);
-
-        // Assert
-        var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        updated.Should().NotBeNull();
-        updated.Achievements.Should().Contain(x =>
-            x.Id == achievement.Id &&
-            x.Name == "Updated Achievement Name" &&
-            x.Description == "Updated Achievement Description" &&
-            x.Points == 99);
-    }
-
-    [Fact]
-    public async Task RemoveAchievementAsync_RemovesAchievement()
-    {
-        // Arrange
-        var newAchievement = new AchievementDetailModel
-        {
-            Id = Guid.NewGuid(),
-            Name = "Achievement To Remove",
-            Description = "Remove me",
-            Points = 15
-        };
-
-        await _facade.AddAchievementAsync(GameTitleSeeds.EldenRing.Id, newAchievement);
-        
-        var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        existing.Should().NotBeNull();
-        existing.Achievements.Should().NotBeEmpty();
-
-        var achievementId = existing.Achievements.First().Id;
-
-        // Act
-        await _facade.RemoveAchievementAsync(achievementId);
-
-        // Assert
-        var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        updated.Should().NotBeNull();
-        updated.Achievements.Should().NotContain(x => x.Id == achievementId);
-    }
-
-    [Fact]
-    public async Task AddReviewAsync_AddsReview()
-    {
-        // Arrange
-        var review = new ReviewDetailModel
-        {
-            UserId = UserSeeds.Boris.Id,
-            Rating = 4,
-            Text = "Very good game",
-            CreatedAt = DateTime.UtcNow
-        };
-
-        // Act
-        await _facade.AddReviewAsync(GameTitleSeeds.TheWitcher3.Id, review);
-
-        // Assert
-        var gameTitle = await _facade.GetAsync(GameTitleSeeds.TheWitcher3.Id);
-        gameTitle.Should().NotBeNull();
-        gameTitle.Reviews.Should().Contain(x => x.Text == "Very good game");
-    }
-
-    [Fact]
-    public async Task UpdateReviewAsync_UpdatesReview()
-    {
-        // Arrange
-        var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        existing.Should().NotBeNull();
-        existing.Reviews.Should().NotBeEmpty();
-
-        var review = existing.Reviews.First();
-        review.Text = "Updated review text";
-        review.Rating = 3;
-        review.UpdatedAt = DateTime.UtcNow;
-
-        // Act
-        await _facade.UpdateReviewAsync(GameTitleSeeds.EldenRing.Id, review);
-
-        // Assert
-        var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        updated.Should().NotBeNull();
-        updated.Reviews.Should().Contain(x =>
-            x.Id == review.Id &&
-            x.Text == "Updated review text" &&
-            x.Rating == 3);
-    }
-
-    [Fact]
-    public async Task RemoveReviewAsync_RemovesReview()
-    {
-        // Arrange
-        var existing = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        existing.Should().NotBeNull();
-        existing.Reviews.Should().NotBeEmpty();
-
-        var reviewId = existing.Reviews.First().Id;
-
-        // Act
-        await _facade.RemoveReviewAsync(reviewId);
-
-        // Assert
-        var updated = await _facade.GetAsync(GameTitleSeeds.EldenRing.Id);
-        updated.Should().NotBeNull();
-        updated.Reviews.Should().NotContain(x => x.Id == reviewId);
     }
 }

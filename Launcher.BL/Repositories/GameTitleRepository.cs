@@ -2,20 +2,16 @@
 using Launcher.DAL.Context;
 using Launcher.BL.Mappers.Interfaces;
 using Launcher.BL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Launcher.BL.Repositories;
 
 public class GameTitleRepository : Repository<GameTitleEntity>, IGameTitleRepository
 {
-    private readonly LauncherDbContext _dbContext;
-
     public GameTitleRepository(
         LauncherDbContext dbContext,
         IEntityMapper<GameTitleEntity> entityMapper)
         : base(dbContext, entityMapper)
     {
-        _dbContext = dbContext;
     }
     
     public IQueryable<GameTitleEntity> GetQuery(
@@ -30,67 +26,6 @@ public class GameTitleRepository : Repository<GameTitleEntity>, IGameTitleReposi
         query = ApplyFilter(query, searchTerm, pegiRating, isAvailable, publisher);
         query = ApplySort(query, sortBy, descending);
         return query;
-    }
-
-    public async Task<GameTitleEntity?> GetForUpdateAsync(
-        Guid id, 
-        CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.GameTitles
-            .Include(x => x.GameTitleGenres)
-            .Include(x => x.GameTitlePlatforms)
-            .Include(x => x.Achievements)
-            .Include(x => x.Reviews)
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-    
-    public async Task<AchievementEntity?> GetAchievementByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Achievements
-            .Include(x => x.UserAchievements)
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<ReviewEntity?> GetReviewByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Reviews
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-    
-    public async Task DeleteAchievementAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        AchievementEntity? entity = await _dbContext.Achievements
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (entity is null)
-        {
-            throw new EntityNotFoundException(typeof(AchievementEntity), id);
-        }
-
-        _dbContext.Achievements.Remove(entity);
-    }
-
-    public async Task DeleteReviewAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        ReviewEntity? entity = await _dbContext.Reviews
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (entity is null)
-        {
-            throw new EntityNotFoundException(typeof(ReviewEntity), id);
-        }
-
-        _dbContext.Reviews.Remove(entity);
     }
 
     private static IQueryable<GameTitleEntity> ApplyFilter(
