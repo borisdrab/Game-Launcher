@@ -13,6 +13,8 @@ public class GameTitleListModel
 
     public DateTime? ReleaseDate { get; set; }
     public bool IsAvailable { get; set; }
+    
+    public string PriceInEurosText => $"{PriceCents / 100.0:F2} €";
 
     public static GameTitleListModel Empty => new();
 }

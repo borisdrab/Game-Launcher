@@ -20,12 +20,16 @@ public static class AppInstaller
 
         // Views
         services.AddTransient<GameTitleListPage>();
+        services.AddTransient<GameTitleDetailPage>();
+        services.AddTransient<GameTitleEditPage>();
         services.AddTransient<LibraryPlaceholderPage>();
         services.AddTransient<SocialsPlaceholderPage>();
         services.AddTransient<UserPlaceholderPage>();
 
         // ViewModels
         services.AddTransient<GameTitleListViewModel>();
+        services.AddTransient<GameTitleDetailViewModel>();
+        services.AddTransient<GameTitleEditViewModel>();
         services.AddTransient<LibraryPlaceholderViewModel>();
         services.AddTransient<SocialsPlaceholderViewModel>();
         services.AddTransient<UserPlaceholderViewModel>();

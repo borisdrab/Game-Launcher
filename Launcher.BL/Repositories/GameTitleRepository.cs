@@ -13,17 +13,18 @@ public class GameTitleRepository : Repository<GameTitleEntity>, IGameTitleReposi
         : base(dbContext, entityMapper)
     {
     }
-    
+
     public IQueryable<GameTitleEntity> GetQuery(
         string? searchTerm,
         int? pegiRating,
         bool? isAvailable,
         string? publisher,
+        IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending)
     {
         IQueryable<GameTitleEntity> query = Get();
-        query = ApplyFilter(query, searchTerm, pegiRating, isAvailable, publisher);
+        query = ApplyFilter(query, searchTerm, pegiRating, isAvailable, publisher, genreIds);
         query = ApplySort(query, sortBy, descending);
         return query;
     }
@@ -33,11 +34,16 @@ public class GameTitleRepository : Repository<GameTitleEntity>, IGameTitleReposi
         string? searchTerm,
         int? pegiRating,
         bool? isAvailable,
-        string? publisher)
+        string? publisher,
+        IEnumerable<Guid>? genreIds)
     {
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
+            string loweredSearch = searchTerm.ToLower();
+
+            query = query.Where(x =>
+                x.Name.ToLower().Contains(loweredSearch) ||
+                x.Description.ToLower().Contains(loweredSearch));
         }
 
         if (pegiRating.HasValue)
@@ -49,12 +55,17 @@ public class GameTitleRepository : Repository<GameTitleEntity>, IGameTitleReposi
         {
             query = query.Where(x => x.IsAvailable == isAvailable.Value);
         }
-        
+
         if (!string.IsNullOrWhiteSpace(publisher))
         {
             query = query.Where(x => x.Publisher.Contains(publisher));
         }
-        
+
+        if (genreIds is not null && genreIds.Any())
+        {
+            query = query.Where(x => x.GameTitleGenres.Any(gtg => genreIds.Contains(gtg.GenreId)));
+        }
+
         return query;
     }
 

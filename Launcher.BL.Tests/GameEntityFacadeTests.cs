@@ -142,7 +142,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     public async Task GetAsync_SearchByName_ReturnsOnlyMatching()
     {
         // Act
-        var results = (await _facade.GetAsync("Witcher", null, null, null, null, false)).ToList();
+        var results = (await _facade.GetAsync("Witcher", null, null, null, null, null, false)).ToList();
 
         // Assert
         results.Should().HaveCount(1);
@@ -153,7 +153,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     public async Task GetAsync_FilterByPegiRating_ReturnsOnlyMatching()
     {
         // Act
-        var results = (await _facade.GetAsync(null, 16, null, null, null, false)).ToList();
+        var results = (await _facade.GetAsync(null, 16, null, null, null, null, false)).ToList();
 
         // Assert
         results.Should().HaveCount(1);
@@ -165,7 +165,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     public async Task GetAsync_FilterByAvailability_ReturnsOnlyMatching()
     {
         // Act
-        var results = (await _facade.GetAsync(null, null, true, null, null, false)).ToList();
+        var results = (await _facade.GetAsync(null, null, true, null, null, null, false)).ToList();
 
         // Assert
         results.Should().HaveCount(2);
@@ -175,7 +175,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     [Fact]
     public async Task GetAsync_FilterByPublisher_ReturnsOnlyMatching()
     {
-        var results = (await _facade.GetAsync(null, null, null, "CD PROJECT RED", null, false)).ToList();
+        var results = (await _facade.GetAsync(null, null, null, "CD PROJECT RED", null, null, false)).ToList();
 
         // Assert
         results.Should().HaveCount(1);
@@ -186,7 +186,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     public async Task GetAsync_SortByName_ReturnsOrdered()
     {
         // Act
-        var results = (await _facade.GetAsync(null, null, null, null, GameTitleSortBy.Name, false)).ToList();
+        var results = (await _facade.GetAsync(null, null, null, null, null, GameTitleSortBy.Name, false)).ToList();
 
         // Assert
         results.Select(x => x.Name).Should().BeInAscendingOrder();
@@ -196,7 +196,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
     public async Task GetAsync_SortByPriceCents_ReturnsOrdered()
     {
         // Act
-        var results = (await _facade.GetAsync(null, null, null, null, GameTitleSortBy.PriceCents, false)).ToList();
+        var results = (await _facade.GetAsync(null, null, null, null, null, GameTitleSortBy.PriceCents, false)).ToList();
 
         // Assert
         results.Select(x => x.PriceCents).Should().BeInAscendingOrder();

@@ -9,6 +9,7 @@ public interface IGameTitleRepository :  IRepository<GameTitleEntity>
         int? pegiRating,
         bool? isAvailable,
         string? publisher,
+        IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending);
 }

@@ -23,12 +23,13 @@ public class GameTitleFacade(
         int? pegiRating,
         bool? isAvailable,
         string? publisher,
+        IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending)
     {
         return mapper.MapToListModel(
             await gameTitleRepository
-                .GetQuery(searchTerm, pegiRating, isAvailable, publisher, sortBy, descending)
+                .GetQuery(searchTerm, pegiRating, isAvailable, publisher, genreIds, sortBy, descending)
                 .ToListAsync());
     }
 
@@ -45,6 +46,7 @@ public class GameTitleFacade(
 
         return GetAsync(
             query.SearchTerm,
+            null,
             null,
             null,
             null,

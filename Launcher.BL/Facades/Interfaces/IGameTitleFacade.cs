@@ -11,6 +11,7 @@ public interface IGameTitleFacade
         int? pegiRating,
         bool? isAvailable,
         string? publisher,
+        IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending);
 }
