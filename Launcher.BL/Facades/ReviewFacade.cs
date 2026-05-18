@@ -36,17 +36,14 @@ public class ReviewFacade
     public async Task<IEnumerable<ReviewListModel>> GetAsync(QueryObject query)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-
-        // Start building the database query
+        
         IQueryable<ReviewEntity> dbQuery = dbContext.Reviews.AsNoTracking();
-
-        // Search by review text if a search term was provided
+        
         if (QueryHelper.HasSearchTerm(query.SearchTerm))
         {
             dbQuery = dbQuery.Where(r => r.Text != null && r.Text.Contains(query.SearchTerm!));
         }
-
-        // Sort by rating or by date
+        
         if (query.SortBy == "Rating")
         {
             dbQuery = QueryHelper.ApplySort(dbQuery, r => r.Rating, query.SortDescending);
@@ -55,8 +52,7 @@ public class ReviewFacade
         {
             dbQuery = QueryHelper.ApplySort(dbQuery, r => r.CreatedAt, query.SortDescending);
         }
-
-        // Execute the query in the database and return results
+        
         var entities = await dbQuery.ToListAsync();
         return _mapper.MapToListModel(entities);
     }
@@ -88,14 +84,12 @@ public class ReviewFacade
 
         if (existingEntity is null)
         {
-            // New review
             entity.Id = Guid.NewGuid();
             entity.CreatedAt = DateTime.UtcNow;
             await dbContext.Reviews.AddAsync(entity);
         }
         else
         {
-            // Update existing review
             existingEntity.Rating = entity.Rating;
             existingEntity.Text = entity.Text;
             existingEntity.UpdatedAt = DateTime.UtcNow;

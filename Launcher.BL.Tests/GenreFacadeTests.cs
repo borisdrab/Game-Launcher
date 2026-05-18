@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using Launcher.BL.Facades;
 using Launcher.BL.Mappers;
 using Launcher.BL.Models;
+using Launcher.BL.Repositories;
 using Launcher.DAL.Seeds;
 using Xunit.Abstractions;
 
@@ -13,9 +14,9 @@ public class GenreFacadeTests : FacadeTestsBase
 
     public GenreFacadeTests(ITestOutputHelper output) : base(output)
     {
-        // Create the mapper and facade that we will test
-        var mapper = new GenreModelMapper();
-        _facade = new GenreFacade(mapper, DbContextFactory);
+        var ctx = DbContextFactory.CreateDbContext();
+        var repository = new GenreRepository(ctx, new GenreEntityMapper());
+        _facade = new GenreFacade(ctx, repository, new GenreModelMapper());
     }
 
     [Fact]
@@ -95,13 +96,13 @@ public class GenreFacadeTests : FacadeTestsBase
     }
 
     [Fact]
-    public async Task Delete_NonExistentGenre_DoesNothing()
+    public async Task Delete_NonExistentGenre_ThrowsException()
     {
-        // Act - try to delete a genre that does not exist (should not throw)
+        // Act - try to delete a genre that does not exist
         var action = async () => await _facade.DeleteAsync(Guid.NewGuid());
 
-        // Assert - no exception should be thrown
-        await action.Should().NotThrowAsync();
+        // Assert - repository throws EntityNotFoundException
+        await action.Should().ThrowAsync<EntityNotFoundException>();
     }
 
     // --- Query / Filter / Sort tests ---

@@ -1,0 +1,5 @@
+namespace Launcher.App.Models;
+
+public record RouteModel(string Route, Type ViewType)
+{
+}

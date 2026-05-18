@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Launcher.App.Views.NavigationBarView"
+             x:Name="NavBarRoot">
+
+    <Grid ColumnDefinitions="*, *, *, *"
+          HeightRequest="38"
+          BackgroundColor="#3D3333">
+
+        <!-- Obchod Tab -->
+        <Border Grid.Column="0"
+                x:Name="ObchodTab"
+                BackgroundColor="#3D3333"
+                Stroke="#666666"
+                StrokeThickness="1"
+                Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnObchodTapped" />
+            </Border.GestureRecognizers>
+            <Label Text="Obchod"
+                   TextColor="White"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+        <!-- Knihovna Tab -->
+        <Border Grid.Column="1"
+                x:Name="KnihivnaTab"
+                BackgroundColor="#3D3333"
+                Stroke="#666666"
+                StrokeThickness="1"
+                Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnKnihovnaTapped" />
+            </Border.GestureRecognizers>
+            <Label Text="Knihovna"
+                   TextColor="White"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+        <!-- Socials Tab -->
+        <Border Grid.Column="2"
+                x:Name="SocialsTab"
+                BackgroundColor="#3D3333"
+                Stroke="#666666"
+                StrokeThickness="1"
+                Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSocialsTapped" />
+            </Border.GestureRecognizers>
+            <Label Text="Socials"
+                   TextColor="White"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+        <!-- User Tab -->
+        <Border Grid.Column="3"
+                x:Name="UserTab"
+                BackgroundColor="#3D3333"
+                Stroke="#666666"
+                StrokeThickness="1"
+                Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnUserTapped" />
+            </Border.GestureRecognizers>
+            <Label Text="Users"
+                   TextColor="White"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+    </Grid>
+</ContentView>

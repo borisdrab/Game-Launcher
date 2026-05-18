@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:Launcher.App.Views"
+       x:Class="Launcher.App.Shells.AppShell"
+       x:Name="AppShellRoot"
+       FlyoutBehavior="Disabled"
+       Shell.NavBarIsVisible="False"
+       Shell.TabBarIsVisible="False">
+
+    <ShellContent Route="games"
+                  ContentTemplate="{DataTemplate views:GameTitleListPage}" />
+    <ShellContent Route="library"
+                  ContentTemplate="{DataTemplate views:LibraryPlaceholderPage}" />
+    <ShellContent Route="socials"
+                  ContentTemplate="{DataTemplate views:SocialsPlaceholderPage}" />
+    <ShellContent Route="users"
+                  ContentTemplate="{DataTemplate views:UserPlaceholderPage}" />
+
+</Shell>
