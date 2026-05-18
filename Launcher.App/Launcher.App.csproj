@@ -54,5 +54,14 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 	</ItemGroup>
+	
+	<!-- fix for MacCatalyst codesign-->
 
+	<Target Name="RemoveMacCatalystExtendedAttributes"
+			BeforeTargets="_CodesignAppBundle"
+			Condition="'$(TargetFramework)' == 'net10.0-maccatalyst' AND $([MSBuild]::IsOSPlatform('osx'))">
+		<Exec Command="xattr -rc &quot;$(AppBundleDir)&quot;" />
+	</Target>
+
+	<!-- fix for MacCatalyst codesign-->
 </Project>
