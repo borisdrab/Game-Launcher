@@ -45,7 +45,6 @@ namespace Launcher.BL.Facades
                         gtg.Genre != null && genres.Any(g => string.Equals(g, gtg.Genre.Name, StringComparison.OrdinalIgnoreCase))) == true);
             }
 
-            // Sorting
             filteredTitles = (sortBy?.ToLower(), ascending) switch
             {
                 ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty),
