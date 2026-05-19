@@ -16,7 +16,7 @@ public class LibraryFacadeTests : FacadeTestsBase
     {
         var ctx = DbContextFactory.CreateDbContext();
         var repository = new LibraryRepository(ctx, new LibraryEntityMapper());
-        _facade = new LibraryFacade(ctx, repository, new LibraryMapper());
+        _facade = new LibraryFacade(ctx, repository, new LibraryModelMapper());
     }
 
     [Fact]
