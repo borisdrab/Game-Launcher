@@ -11,12 +11,16 @@ public class NavigationService : INavigationService
     public const string SocialsRouteAbsolute = "//socials";
     public const string UserListRouteAbsolute = "//users";
 
+    public const string UserEditRoute = "useredit";
+
     public IEnumerable<RouteModel> Routes { get; } = new List<RouteModel>
     {
         new(GameListRouteAbsolute, typeof(GameTitleListPage)),
         new(LibraryListRouteAbsolute, typeof(LibraryPlaceholderPage)),
         new(SocialsRouteAbsolute, typeof(SocialsPlaceholderPage)),
-        new(UserListRouteAbsolute, typeof(UserPlaceholderPage)),
+        new(UserListRouteAbsolute, typeof(UserListPage)),
+
+        new(UserEditRoute, typeof(UserEditPage)),
     };
 
     public async Task GoToAsync(string route)

@@ -1,7 +1,6 @@
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Mappers.Interfaces;
 using Launcher.BL.Models;
-using Launcher.BL.Repositories.Interfaces;
 using Launcher.DAL.Context;
 using Launcher.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,22 +8,23 @@ using Microsoft.EntityFrameworkCore;
 namespace Launcher.BL.Facades;
 
 public class UserFacade(
-    LauncherDbContext ctx,
-    IUserRepository userRepository,
-    IModelMapper<UserEntity, UserListModel, UserDetailModel> mapper)
+    IModelMapper<UserEntity, UserListModel, UserDetailModel> mapper,
+    IDbContextFactory<LauncherDbContext> dbContextFactory)
     : FacadeBase<UserEntity, UserListModel, UserDetailModel>(mapper), IUserFacade
 {
     public override async Task<IEnumerable<UserListModel>> GetAsync()
-        => _mapper.MapToListModel(await userRepository.Get().ToListAsync());
+    {
+        await using var ctx = await dbContextFactory.CreateDbContextAsync();
+        return _mapper.MapToListModel(await ctx.Users.AsNoTracking().ToListAsync());
+    }
 
     public async Task<IEnumerable<UserListModel>> GetAsync(string? searchTerm, string? sortBy, bool ascending)
     {
-        IQueryable<UserEntity> query = userRepository.Get();
+        await using var ctx = await dbContextFactory.CreateDbContextAsync();
+        IQueryable<UserEntity> query = ctx.Users.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            query = query.Where(u => u.UserName.Contains(searchTerm) || u.DisplayName.Contains(searchTerm));   
-        }
+            query = query.Where(u => u.UserName.Contains(searchTerm) || u.DisplayName.Contains(searchTerm));
 
         query = (sortBy?.ToLower(), ascending) switch
         {
@@ -36,35 +36,51 @@ public class UserFacade(
             ("email", false) => query.OrderByDescending(u => u.Email),
             _ => query.OrderBy(u => u.UserName)
         };
-        
+
         return _mapper.MapToListModel(await query.ToListAsync());
     }
 
     public override async Task<UserDetailModel?> GetAsync(Guid id)
     {
-        var entity = await userRepository.Get().FirstOrDefaultAsync(u => u.Id == id);
+        await using var ctx = await dbContextFactory.CreateDbContextAsync();
+        var entity = await ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
         return entity is null ? null : _mapper.MapToDetailModel(entity);
     }
 
-    public override async Task<Guid> SaveAsync(UserDetailModel detailModel)
+    public override async Task<Guid> SaveAsync(UserDetailModel model)
     {
-        var entity = _mapper.MapToEntity(detailModel);
-        if (detailModel.Id == Guid.Empty)
+        await using var ctx = await dbContextFactory.CreateDbContextAsync();
+        var entity = _mapper.MapToEntity(model);
+
+        if (model.Id == Guid.Empty)
         {
             entity.Id = Guid.NewGuid();
-            userRepository.Insert(entity);
-            await ctx.SaveChangesAsync();
-            return entity.Id;
+            await ctx.Users.AddAsync(entity);
         }
-        
-        await userRepository.UpdateAsync(entity);
+        else
+        {
+            var existing = await ctx.Users.FirstOrDefaultAsync(u => u.Id == model.Id);
+            if (existing is not null)
+            {
+                existing.UserName = entity.UserName;
+                existing.Email = entity.Email;
+                existing.DisplayName = entity.DisplayName;
+                existing.AvatarUrl = entity.AvatarUrl;
+            }
+        }
+
         await ctx.SaveChangesAsync();
         return entity.Id;
     }
 
     public override async Task DeleteAsync(Guid id)
     {
-        await userRepository.DeleteAsync(id);
-        await ctx.SaveChangesAsync();
+        await using var ctx = await dbContextFactory.CreateDbContextAsync();
+        var entity = await ctx.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (entity is not null)
+        {
+            ctx.Users.Remove(entity);
+            await ctx.SaveChangesAsync();
+        }
     }
 }
