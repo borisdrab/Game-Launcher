@@ -12,7 +12,6 @@ namespace Launcher.BL.Models
         public Guid UserId { get; set; }
         public UserEntity? User { get; set; }
 
-
         public ICollection<LibraryTitleEntity> LibraryTitles { get; set; } = new List<LibraryTitleEntity>();
 
         public static LibraryListModel Empty => new();
