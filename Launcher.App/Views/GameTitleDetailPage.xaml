@@ -115,10 +115,21 @@
                 Grid.Column="1"
                 BackgroundColor="#6A6666"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,Auto,* ,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
                   Padding="18">
-                
-                <Border Grid.Row="0"
+
+                <Button Grid.Row="0"
+                        Text="Edit"
+                        Command="{Binding GoToEditCommand}"
+                        BackgroundColor="#AA3333"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HorizontalOptions="End"
+                        WidthRequest="90"
+                        HeightRequest="40"
+                        Margin="0,0,0,8" />
+
+                <Border Grid.Row="1"
                         HeightRequest="320"
                         BackgroundColor="#4A4040"
                         StrokeThickness="0">
@@ -140,7 +151,6 @@
                         <Border WidthRequest="42"
                                 HeightRequest="42"
                                 Margin="8"
-                                BackgroundColor="#DDDDDD"
                                 Stroke="#333333"
                                 StrokeThickness="1.5"
                                 HorizontalOptions="End"
@@ -150,63 +160,50 @@
                                 <RoundRectangle CornerRadius="10" />
                             </Border.StrokeShape>
 
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFavorite}"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="#F2D14C" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFavorite}"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="#DDDDDD" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="☆"
-                                   HorizontalOptions="Center"
+                            <Label HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
                                    TextColor="#333333"
                                    FontSize="28"
                                    FontAttributes="Bold"
-                                   TranslationY="-1" />
+                                   TranslationY="-1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="True">
+                                        <Setter Property="Text" Value="★" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="False">
+                                        <Setter Property="Text" Value="☆" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
                         </Border>
-
-                        <!-- TITLE -->
-                        <Grid Margin="10"
-                              VerticalOptions="Start">
-                            <Label Text="{Binding GameTitle.Name}"
-                                   TextColor="#B00000"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   TranslationX="-1"
-                                   TranslationY="-1" />
-                            <Label Text="{Binding GameTitle.Name}"
-                                   TextColor="#B00000"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   TranslationX="1"
-                                   TranslationY="-1" />
-                            <Label Text="{Binding GameTitle.Name}"
-                                   TextColor="#B00000"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   TranslationX="-1"
-                                   TranslationY="1" />
-                            <Label Text="{Binding GameTitle.Name}"
-                                   TextColor="#B00000"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   TranslationX="1"
-                                   TranslationY="1" />
-                            <Label Text="{Binding GameTitle.Name}"
-                                   TextColor="White"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center" />
-                        </Grid>
                     </Grid>
                 </Border>
 
                 <!-- GENRES -->
-                <CollectionView Grid.Row="1"
+                <CollectionView Grid.Row="2"
                                 Margin="0,18,0,0"
                                 ItemsSource="{Binding GameTitle.Genres}"
                                 SelectionMode="None">
@@ -221,7 +218,7 @@
                 </CollectionView>
 
                 <!-- BUY -->
-                <HorizontalStackLayout Grid.Row="2"
+                <HorizontalStackLayout Grid.Row="3"
                                        Margin="0,18,0,0"
                                        HorizontalOptions="Center"
                                        Spacing="10">
@@ -245,11 +242,11 @@
                                FontAttributes="Bold" />
                     </Border>
                 </HorizontalStackLayout>
-                
-                <Grid Grid.Row="3" />
+
+                <Grid Grid.Row="4" />
 
                 <!-- PEGI AND AVERAGE RATING -->
-                <Grid Grid.Row="4"
+                <Grid Grid.Row="5"
                       ColumnDefinitions="90,*"
                       ColumnSpacing="12"
                       Margin="0,18,0,0"
@@ -270,6 +267,12 @@
                                        FontAttributes="Bold"
                                        HorizontalTextAlignment="Center"
                                        VerticalOptions="CenterAndExpand" />
+                                <Label Text="PEGI"
+                                       TextColor="White"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center"
+                                       HorizontalOptions="Center" />    
                             </VerticalStackLayout>
                         </Border>
                     </Grid>
@@ -324,7 +327,7 @@
                                     <FormattedString>
                                         <Span Text="{Binding Rating, StringFormat='{}{0}/5  '}"
                                               FontAttributes="Bold" />
-                                        <Span Text=" "/>
+                                        <Span Text=" " />
                                         <Span Text="{Binding Text}" />
                                     </FormattedString>
                                 </Label.FormattedText>

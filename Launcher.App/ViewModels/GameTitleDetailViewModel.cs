@@ -21,6 +21,9 @@ public partial class GameTitleDetailViewModel(
     [ObservableProperty]
     private GameTitleDetailModel? _gameTitle;
     
+    [ObservableProperty]
+    private bool _isFavorite;
+    
     public string PriceInEurosText
         => GameTitle is null
             ? "0.00 €"
@@ -89,8 +92,20 @@ public partial class GameTitleDetailViewModel(
     }
     
     [RelayCommand]
+    private async Task BuyAsync()
+    {
+        if (GameTitle is null)
+        {
+            return;
+        }
+
+        await alertService.DisplayAsync("Buy", $"Buying {GameTitle.Name}.");
+    }
+    
+    [RelayCommand]
     private async Task ToggleFavoriteAsync()
     {
+        IsFavorite = !IsFavorite;
         await Task.CompletedTask;
     }
 

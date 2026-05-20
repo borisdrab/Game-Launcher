@@ -14,9 +14,7 @@ public class GameTitleFacadeTests : FacadeTestsBase
 
     public GameTitleFacadeTests(ITestOutputHelper output) : base(output)
     {
-        var ctx = DbContextFactory.CreateDbContext();
-        var repository = new GameTitleRepository(ctx, new GameTitleEntityMapper());
-        _facade = new GameTitleFacade(ctx, repository, new GameTitleModelMapper());
+        _facade = new GameTitleFacade(DbContextFactory, new GameTitleModelMapper());
     }
 
     [Fact]
