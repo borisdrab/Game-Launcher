@@ -1,24 +1,42 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Launcher.App.Messages;
+using Launcher.App.Models;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
 using Launcher.BL.Repositories;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Launcher.App.ViewModels;
 
-public partial class GameTitleListViewModel : ViewModelBase
+public partial class GameTitleListViewModel : ViewModelBase,
+    IRecipient<GameTitleEditMessage>,
+    IRecipient<GameTitleDeleteMessage>
 {
     private readonly IGameTitleFacade _gameTitleFacade;
     private readonly IGenreFacade _genreFacade;
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
 
-    [ObservableProperty] private IEnumerable<GameTitleListModel> _games = [];
+    [ObservableProperty]
+    private IEnumerable<GameTitleListModel> _games = [];
 
-    [ObservableProperty] private IEnumerable<GenreListModel> _genres = [];
+    public ObservableCollection<GenreFilterItem> Genres { get; } = [];
 
-    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    [ObservableProperty]
+    private GameTitleSortBy? _selectedSortBy;
+
+    [ObservableProperty]
+    private bool _sortDescending;
+
+    public IEnumerable<GameTitleSortBy> SortOptions { get; } = Enum.GetValues<GameTitleSortBy>();
 
     public GameTitleListViewModel(
         IGameTitleFacade gameTitleFacade,
@@ -32,47 +50,124 @@ public partial class GameTitleListViewModel : ViewModelBase
         _genreFacade = genreFacade;
         _navigationService = navigationService;
         _alertService = alertService;
+
+        Genres.CollectionChanged += Genres_CollectionChanged;
     }
 
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
 
-        await RunSafeAsync(async () =>
+        if (Genres.Count == 0)
         {
-            await LoadGamesAsync();
-            Genres = await _genreFacade.GetAsync();
-        }, _alertService);
+            var genreModels = await _genreFacade.GetAsync();
+
+            foreach (var genre in genreModels)
+            {
+                var item = GenreFilterItem.FromModel(genre);
+                item.PropertyChanged += GenreItem_PropertyChanged;
+                Genres.Add(item);
+            }
+        }
+
+        await ReloadGamesAsync();
     }
 
-    partial void OnSearchTextChanged(string value)
+    private void Genres_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        _ = HandleSearchAsync();
+        if (e.NewItems is not null)
+        {
+            foreach (GenreFilterItem item in e.NewItems)
+            {
+                item.PropertyChanged += GenreItem_PropertyChanged;
+            }
+        }
+
+        if (e.OldItems is not null)
+        {
+            foreach (GenreFilterItem item in e.OldItems)
+            {
+                item.PropertyChanged -= GenreItem_PropertyChanged;
+            }
+        }
     }
 
-    private async Task HandleSearchAsync()
+    private async void GenreItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        await RunSafeAsync(async () =>
+        if (e.PropertyName == nameof(GenreFilterItem.IsSelected))
         {
-            await LoadGamesAsync();
-        }, _alertService);
+            await ReloadGamesAsync();
+        }
     }
 
     [RelayCommand]
     private async Task GoToDetailAsync(Guid id)
     {
-        // TODO: Navigate to game detail page when it is implemented
+        await _navigationService.GoToAsync(
+            NavigationService.GameDetailRouteRelative,
+            new Dictionary<string, object?>
+            {
+                ["Id"] = id
+            });
+    }
+
+    [RelayCommand]
+    private async Task GoToCreateAsync()
+    {
+        await _navigationService.GoToAsync(NavigationService.GameEditRouteRelative);
+    }
+
+    [RelayCommand]
+    private async Task SearchAsync()
+    {
+        await ReloadGamesAsync();
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        SearchCommand.Execute(null);
+    }
+
+    private async Task ReloadGamesAsync()
+    {
+        var selectedGenreIds = Genres
+            .Where(g => g.IsSelected)
+            .Select(g => g.Id)
+            .ToList();
+
+        Games = await _gameTitleFacade.GetAsync(
+            string.IsNullOrWhiteSpace(SearchText) ? null : SearchText,
+            null,
+            true,
+            null,
+            selectedGenreIds,
+            SelectedSortBy,
+            SortDescending);
+    }
+
+    [RelayCommand]
+    private async Task ToggleFavoriteAsync(Guid id)
+    {
         await Task.CompletedTask;
     }
 
-    private async Task LoadGamesAsync()
+    partial void OnSelectedSortByChanged(GameTitleSortBy? value)
     {
-        Games = await _gameTitleFacade.GetAsync(
-            SearchText,
-            null,
-            null,
-            null,
-            GameTitleSortBy.Name,
-            false);
+        SearchCommand.Execute(null);
+    }
+
+    partial void OnSortDescendingChanged(bool value)
+    {
+        SearchCommand.Execute(null);
+    }
+
+    public void Receive(GameTitleEditMessage message)
+    {
+        ForceDataRefreshOnNextAppearing();
+    }
+
+    public void Receive(GameTitleDeleteMessage message)
+    {
+        ForceDataRefreshOnNextAppearing();
     }
 }

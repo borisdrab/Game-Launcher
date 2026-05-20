@@ -2,34 +2,91 @@ using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Mappers;
 using Launcher.BL.Models;
 using Launcher.BL.Repositories;
-using Launcher.BL.Repositories.Interfaces;
-using Launcher.DAL.Entities;
 using Launcher.DAL.Context;
+using Launcher.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Launcher.BL.Facades;
 
 public class GameTitleFacade(
-    LauncherDbContext ctx,
-    IGameTitleRepository gameTitleRepository,
+    IDbContextFactory<LauncherDbContext> dbContextFactory,
     GameTitleModelMapper mapper)
     : FacadeBase<GameTitleEntity, GameTitleListModel, GameTitleDetailModel>(mapper), IGameTitleFacade
 {
     public override async Task<IEnumerable<GameTitleListModel>> GetAsync()
-        => mapper.MapToListModel(await gameTitleRepository.Get().OrderBy(g => g.Name).ToListAsync());
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entities = await dbContext.GameTitles
+            .AsNoTracking()
+            .OrderBy(g => g.Name)
+            .ToListAsync();
+
+        return mapper.MapToListModel(entities);
+    }
 
     public async Task<IEnumerable<GameTitleListModel>> GetAsync(
         string? searchTerm,
         int? pegiRating,
         bool? isAvailable,
         string? publisher,
+        IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending)
     {
-        return mapper.MapToListModel(
-            await gameTitleRepository
-                .GetQuery(searchTerm, pegiRating, isAvailable, publisher, sortBy, descending)
-                .ToListAsync());
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        IQueryable<GameTitleEntity> query = dbContext.GameTitles
+            .AsNoTracking()
+            .Include(x => x.GameTitleGenres);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            string loweredSearch = searchTerm.ToLower();
+            query = query.Where(x =>
+                x.Name.ToLower().Contains(loweredSearch) ||
+                x.Description.ToLower().Contains(loweredSearch));
+        }
+
+        if (pegiRating.HasValue)
+        {
+            query = query.Where(x => x.PegiRating == pegiRating.Value);
+        }
+
+        if (isAvailable.HasValue)
+        {
+            query = query.Where(x => x.IsAvailable == isAvailable.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(publisher))
+        {
+            query = query.Where(x => x.Publisher.Contains(publisher));
+        }
+
+        if (genreIds is not null && genreIds.Any())
+        {
+            query = query.Where(x => x.GameTitleGenres.Any(gtg => genreIds.Contains(gtg.GenreId)));
+        }
+
+        query = (sortBy, descending) switch
+        {
+            (GameTitleSortBy.Name, false) => query.OrderBy(x => x.Name),
+            (GameTitleSortBy.Name, true) => query.OrderByDescending(x => x.Name),
+
+            (GameTitleSortBy.PegiRating, false) => query.OrderBy(x => x.PegiRating),
+            (GameTitleSortBy.PegiRating, true) => query.OrderByDescending(x => x.PegiRating),
+
+            (GameTitleSortBy.PriceCents, false) => query.OrderBy(x => x.PriceCents),
+            (GameTitleSortBy.PriceCents, true) => query.OrderByDescending(x => x.PriceCents),
+
+            (GameTitleSortBy.ReleaseDate, false) => query.OrderBy(x => x.ReleaseDate),
+            (GameTitleSortBy.ReleaseDate, true) => query.OrderByDescending(x => x.ReleaseDate),
+
+            _ => query.OrderBy(x => x.Name)
+        };
+
+        var entities = await query.ToListAsync();
+        return mapper.MapToListModel(entities);
     }
 
     public Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
@@ -48,224 +105,83 @@ public class GameTitleFacade(
             null,
             null,
             null,
+            null,
             sortBy,
             query.SortDescending);
     }
 
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
     {
-        GameTitleEntity? entity = await gameTitleRepository
-            .Get()
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = await dbContext.GameTitles
+            .AsNoTracking()
             .Include(x => x.GameTitleGenres)
                 .ThenInclude(x => x.Genre)
             .Include(x => x.GameTitlePlatforms)
                 .ThenInclude(x => x.Platform)
             .Include(x => x.Reviews)
             .Include(x => x.Achievements)
-                .ThenInclude(x => x.UserAchievements)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         return entity is null ? null : mapper.MapToDetailModel(entity);
     }
-    
+
     public override async Task<Guid> SaveAsync(GameTitleDetailModel model)
     {
-        GameTitleEntity entity = mapper.MapToEntity(model);
+        if (model.Genres.Count > 0 ||
+            model.Platforms.Count > 0 ||
+            model.Achievements.Count > 0 ||
+            model.Reviews.Count > 0)
+        {
+            throw new InvalidOperationException("SaveAsync supports only scalar GameTitle properties.");
+        }
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = mapper.MapToEntity(model);
 
         if (model.Id == Guid.Empty)
         {
             entity.Id = Guid.NewGuid();
-            gameTitleRepository.Insert(entity);
-            await ctx.SaveChangesAsync();
+            await dbContext.GameTitles.AddAsync(entity);
+            await dbContext.SaveChangesAsync();
             return entity.Id;
         }
 
-        await gameTitleRepository.UpdateAsync(entity);
-        await ctx.SaveChangesAsync();
-        return entity.Id;
+        var existingEntity = await dbContext.GameTitles
+            .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+        if (existingEntity is null)
+        {
+            throw new InvalidOperationException($"GameTitle with ID {model.Id} was not found.");
+        }
+
+        existingEntity.Name = entity.Name;
+        existingEntity.Description = entity.Description;
+        existingEntity.PegiRating = entity.PegiRating;
+        existingEntity.PriceCents = entity.PriceCents;
+        existingEntity.CoverImageUrl = entity.CoverImageUrl;
+        existingEntity.Publisher = entity.Publisher;
+        existingEntity.ReleaseDate = entity.ReleaseDate;
+        existingEntity.IsAvailable = entity.IsAvailable;
+
+        await dbContext.SaveChangesAsync();
+        return existingEntity.Id;
     }
 
     public override async Task DeleteAsync(Guid id)
     {
-        await gameTitleRepository.DeleteAsync(id);
-        await ctx.SaveChangesAsync();
-    }
-    
-    public async Task AddGenreAsync(Guid gameTitleId, Guid genreId)
-    {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = await dbContext.GameTitles.FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
         {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
+            throw new InvalidOperationException($"GameTitle with ID {id} was not found.");
         }
 
-        if (entity.GameTitleGenres.Any(x => x.GenreId == genreId))
-        {
-            return;
-        }
-
-        entity.GameTitleGenres.Add(mapper.MapGenreToEntity(gameTitleId, genreId));
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task RemoveGenreAsync(Guid gameTitleId, Guid genreId)
-    {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
-
-        if (entity is null)
-        {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
-        }
-
-        GameTitleGenreEntity? relation = entity.GameTitleGenres
-            .SingleOrDefault(x => x.GenreId == genreId);
-
-        if (relation is null)
-        {
-            return;
-        }
-
-        entity.GameTitleGenres.Remove(relation);
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task AddPlatformAsync(Guid gameTitleId, Guid platformId)
-    {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
-
-        if (entity is null)
-        {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
-        }
-
-        if (entity.GameTitlePlatforms.Any(x => x.PlatformId == platformId))
-        {
-            return;
-        }
-
-        entity.GameTitlePlatforms.Add(mapper.MapPlatformToEntity(gameTitleId, platformId));
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task RemovePlatformAsync(Guid gameTitleId, Guid platformId)
-    {
-        GameTitleEntity? entity = await gameTitleRepository.GetForUpdateAsync(gameTitleId);
-
-        if (entity is null)
-        {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
-        }
-
-        GameTitlePlatformEntity? relation = entity.GameTitlePlatforms
-            .SingleOrDefault(x => x.PlatformId == platformId);
-
-        if (relation is null)
-        {
-            return;
-        }
-
-        entity.GameTitlePlatforms.Remove(relation);
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task AddAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
-    {
-        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
-
-        if (!exists)
-        {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
-        }
-
-        AchievementEntity achievement = mapper.MapAchievementToEntity(model, gameTitleId);
-
-        if (achievement.Id == Guid.Empty)
-        {
-            achievement.Id = Guid.NewGuid();
-        }
-
-        ctx.Achievements.Add(achievement);
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task UpdateAchievementAsync(Guid gameTitleId, AchievementDetailModel model)
-    {
-        AchievementEntity? existingAchievement = await gameTitleRepository.GetAchievementByIdAsync(model.Id);
-
-        if (existingAchievement is null)
-        {
-            throw new InvalidOperationException($"Achievement with id {model.Id} was not found.");
-        }
-
-        if (existingAchievement.GameTitleId != gameTitleId)
-        {
-            throw new InvalidOperationException("Achievement does not belong to the specified GameTitle.");
-        }
-
-        AchievementEntity mappedAchievement = mapper.MapAchievementToEntity(model, gameTitleId);
-
-        existingAchievement.Name = mappedAchievement.Name;
-        existingAchievement.Description = mappedAchievement.Description;
-        existingAchievement.Points = mappedAchievement.Points;
-
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task RemoveAchievementAsync(Guid achievementId)
-    {
-        await gameTitleRepository.DeleteAchievementAsync(achievementId);
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task AddReviewAsync(Guid gameTitleId, ReviewDetailModel model)
-    {
-        bool exists = await ctx.GameTitles.AnyAsync(x => x.Id == gameTitleId);
-
-        if (!exists)
-        {
-            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
-        }
-
-        ReviewEntity review = mapper.MapReviewToEntity(model, gameTitleId);
-
-        if (review.Id == Guid.Empty)
-        {
-            review.Id = Guid.NewGuid();
-        }
-
-        ctx.Reviews.Add(review);
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task UpdateReviewAsync(Guid gameTitleId, ReviewDetailModel model)
-    {
-        ReviewEntity? existingReview = await gameTitleRepository.GetReviewByIdAsync(model.Id);
-
-        if (existingReview is null)
-        {
-            throw new InvalidOperationException($"Review with id {model.Id} was not found.");
-        }
-
-        if (existingReview.GameTitleId != gameTitleId)
-        {
-            throw new InvalidOperationException("Review does not belong to the specified GameTitle.");
-        }
-
-        ReviewEntity mappedReview = mapper.MapReviewToEntity(model, gameTitleId);
-
-        existingReview.UserId = mappedReview.UserId;
-        existingReview.Rating = mappedReview.Rating;
-        existingReview.Text = mappedReview.Text;
-        existingReview.CreatedAt = mappedReview.CreatedAt;
-        existingReview.UpdatedAt = mappedReview.UpdatedAt ?? DateTime.UtcNow;
-
-        await ctx.SaveChangesAsync();
-    }
-
-    public async Task RemoveReviewAsync(Guid reviewId)
-    {
-        await gameTitleRepository.DeleteReviewAsync(reviewId);
-        await ctx.SaveChangesAsync();
+        dbContext.GameTitles.Remove(entity);
+        await dbContext.SaveChangesAsync();
     }
 }

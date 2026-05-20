@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:views="clr-namespace:Launcher.App.Views"
+                       xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       xmlns:m="clr-namespace:Launcher.BL.Models;assembly=Launcher.BL"
+                       x:Class="Launcher.App.Views.GameTitleDetailPage"
+                       x:DataType="vm:GameTitleDetailViewModel"
+                       BackgroundColor="#352A2A"
+                       Shell.NavBarIsVisible="False"
+                       Shell.TabBarIsVisible="False">
+
+    <Grid RowDefinitions="210,*,Auto"
+          ColumnDefinitions="*,260"
+          RowSpacing="0"
+          ColumnSpacing="0">
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0"
+              Grid.ColumnSpan="2">
+            <Image Source="{Binding GameTitle.CoverImageUrl}"
+                   Aspect="AspectFill" />
+
+            <BoxView Color="Black"
+                     Opacity="0.35" />
+
+            <Border WidthRequest="78"
+                    HeightRequest="78"
+                    Margin="16"
+                    BackgroundColor="#22000000"
+                    Stroke="Black"
+                    StrokeThickness="2"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Start"
+                    Padding="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+
+                <Label Text="←"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       TextColor="Black"
+                       FontSize="54"
+                       FontAttributes="Bold"
+                       TranslationY="-2" />
+            </Border>
+
+            <Grid HorizontalOptions="Center"
+                  VerticalOptions="Center">
+                <Label Text="{Binding GameTitle.Name}"
+                       TextColor="#B00000"
+                       FontSize="38"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TranslationX="-2"
+                       TranslationY="-2" />
+                <Label Text="{Binding GameTitle.Name}"
+                       TextColor="#B00000"
+                       FontSize="38"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TranslationX="2"
+                       TranslationY="-2" />
+                <Label Text="{Binding GameTitle.Name}"
+                       TextColor="#B00000"
+                       FontSize="38"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TranslationX="-2"
+                       TranslationY="2" />
+                <Label Text="{Binding GameTitle.Name}"
+                       TextColor="#B00000"
+                       FontSize="38"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TranslationX="2"
+                       TranslationY="2" />
+                <Label Text="{Binding GameTitle.Name}"
+                       TextColor="White"
+                       FontSize="38"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+            </Grid>
+        </Grid>
+
+        <!-- DESCRIPTION -->
+        <Border Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.Column="0"
+                BackgroundColor="#3C2F2F"
+                StrokeThickness="0"
+                Margin="0">
+            <ScrollView>
+                <VerticalStackLayout Padding="28,22"
+                                     Spacing="18">
+                    <Label Text="{Binding GameTitle.Description}"
+                           TextColor="White"
+                           FontSize="20"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+        <!-- RIGHT PANEL -->
+        <Border Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.Column="1"
+                BackgroundColor="#6A6666"
+                StrokeThickness="0">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+                  Padding="18">
+
+                <Button Grid.Row="0"
+                        Text="Edit"
+                        Command="{Binding GoToEditCommand}"
+                        BackgroundColor="#AA3333"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HorizontalOptions="End"
+                        WidthRequest="90"
+                        HeightRequest="40"
+                        Margin="0,0,0,8" />
+
+                <Border Grid.Row="1"
+                        HeightRequest="320"
+                        BackgroundColor="#4A4040"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Opacity="0.45"
+                                Radius="18"
+                                Offset="8,8" />
+                    </Border.Shadow>
+
+                    <Grid>
+                        <Image Source="{Binding GameTitle.CoverImageUrl}"
+                               Aspect="AspectFill" />
+
+                        <!-- FAVOURITE BUTTON -->
+                        <Border WidthRequest="42"
+                                HeightRequest="42"
+                                Margin="8"
+                                Stroke="#333333"
+                                StrokeThickness="1.5"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start"
+                                Padding="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFavorite}"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="#F2D14C" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFavorite}"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="#DDDDDD" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}" />
+                            </Border.GestureRecognizers>
+
+                            <Label HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#333333"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TranslationY="-1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="True">
+                                        <Setter Property="Text" Value="★" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="False">
+                                        <Setter Property="Text" Value="☆" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- GENRES -->
+                <CollectionView Grid.Row="2"
+                                Margin="0,18,0,0"
+                                ItemsSource="{Binding GameTitle.Genres}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="m:GenreDetailModel">
+                            <Label Text="{Binding Name}"
+                                   TextColor="White"
+                                   FontSize="18"
+                                   HorizontalTextAlignment="Center" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- BUY -->
+                <HorizontalStackLayout Grid.Row="3"
+                                       Margin="0,18,0,0"
+                                       HorizontalOptions="Center"
+                                       Spacing="10">
+                    <Label Text="Buy:"
+                           TextColor="White"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+
+                    <Border BackgroundColor="#D9D9D9"
+                            Stroke="#32C852"
+                            StrokeThickness="5"
+                            Padding="16,4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+
+                        <Label Text="{Binding PriceInEurosText}"
+                               TextColor="#32C852"
+                               FontSize="24"
+                               FontAttributes="Bold" />
+                    </Border>
+                </HorizontalStackLayout>
+
+                <Grid Grid.Row="4" />
+
+                <!-- PEGI AND AVERAGE RATING -->
+                <Grid Grid.Row="5"
+                      ColumnDefinitions="90,*"
+                      ColumnSpacing="12"
+                      Margin="0,18,0,0"
+                      VerticalOptions="End">
+
+                    <Grid Grid.Column="0"
+                          HorizontalOptions="Center"
+                          VerticalOptions="End">
+                        <Border BackgroundColor="#D71920"
+                                WidthRequest="72"
+                                HeightRequest="96"
+                                StrokeThickness="0">
+                            <VerticalStackLayout Spacing="0"
+                                                 Padding="0">
+                                <Label Text="{Binding GameTitle.PegiRating}"
+                                       TextColor="White"
+                                       FontSize="42"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalOptions="CenterAndExpand" />
+                                <Label Text="PEGI"
+                                       TextColor="White"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center"
+                                       HorizontalOptions="Center" />    
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <VerticalStackLayout Grid.Column="1"
+                                         Spacing="6"
+                                         VerticalOptions="End">
+                        <HorizontalStackLayout HorizontalOptions="Center"
+                                               Spacing="8">
+                            <Label Text="{Binding AverageRatingText}"
+                                   TextColor="White"
+                                   FontSize="26"
+                                   FontAttributes="Bold" />
+                            <Label Text="☆"
+                                   TextColor="White"
+                                   FontSize="44"
+                                   TranslationY="-15" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- REVIEWS -->
+        <Border Grid.Row="2"
+                Grid.Column="0"
+                BackgroundColor="#886A6666"
+                StrokeThickness="0"
+                Padding="18,14">
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Reviews:"
+                       TextColor="Black"
+                       FontSize="26"
+                       FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding GameTitle.Reviews}"
+                                SelectionMode="None"
+                                HeightRequest="100">
+                    <CollectionView.EmptyView>
+                        <Label Text="No reviews yet"
+                               TextColor="Black"
+                               FontSize="18" />
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="m:ReviewDetailModel">
+                            <Label TextColor="Black"
+                                   FontSize="18"
+                                   LineBreakMode="WordWrap">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Rating, StringFormat='{}{0}/5  '}"
+                                              FontAttributes="Bold" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Text}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</views:ContentPageBase>

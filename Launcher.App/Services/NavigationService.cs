@@ -10,6 +10,9 @@ public class NavigationService : INavigationService
     public const string LibraryListRouteAbsolute = "//library";
     public const string SocialsRouteAbsolute = "//socials";
     public const string UserListRouteAbsolute = "//users";
+    
+    public const string GameDetailRouteRelative = "game-detail";
+    public const string GameEditRouteRelative = "game-edit";
 
     public const string UserEditRoute = "useredit";
 
@@ -21,6 +24,9 @@ public class NavigationService : INavigationService
         new(UserListRouteAbsolute, typeof(UserListPage)),
 
         new(UserEditRoute, typeof(UserEditPage)),
+
+        new(GameDetailRouteRelative, typeof(GameTitleDetailPage)),
+        new(GameEditRouteRelative, typeof(GameTitleEditPage)),
     };
 
     public async Task GoToAsync(string route)

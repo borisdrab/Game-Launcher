@@ -1,4 +1,6 @@
 using Launcher.DAL.Context;
+using Launcher.DAL.Seeds;
+using Launcher.DAL.Migrator;
 using Launcher.DAL.Factories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,9 @@ public static class DALInstaller
     {
         services.AddSingleton<IDbContextFactory<LauncherDbContext>>(_ =>
             new LauncherDbContextSqLiteFactory(databaseName));
+        
+        services.AddSingleton<IDbMigrator, DbMigrator>();
+        services.AddSingleton<IDbSeeder, DbSeeder>();
 
         return services;
     }

@@ -3,6 +3,8 @@ using Launcher.App.Services;
 using Launcher.BL;
 using Launcher.DAL;
 using Launcher.DAL.Context;
+using Launcher.DAL.Seeds;
+using Launcher.DAL.Migrator;
 using Microsoft.EntityFrameworkCore;
 
 using System.IO;
@@ -31,7 +33,8 @@ public static class MauiProgram
 
         var app = builder.Build();
 
-        MigrateDb(app);
+        MigrateDb(app.Services.GetRequiredService<IDbMigrator>());
+        SeedDb(app.Services.GetRequiredService<IDbSeeder>());
         RegisterRouting(app.Services.GetRequiredService<INavigationService>());
 
         return app;
@@ -45,10 +48,7 @@ public static class MauiProgram
         }
     }
 
-    private static void MigrateDb(MauiApp app)
-    {
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<LauncherDbContext>();
-        dbContext.Database.Migrate();
-    }
+    private static void MigrateDb(IDbMigrator migrator) => migrator.Migrate();
+
+    private static void SeedDb(IDbSeeder dbSeeder) => dbSeeder.Seed();
 }

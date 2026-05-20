@@ -35,7 +35,7 @@ public class GameTitleModelMapper
                 Publisher = entity.Publisher,
                 ReleaseDate = entity.ReleaseDate,
                 IsAvailable = entity.IsAvailable,
-                
+
                 Genres = entity.GameTitleGenres
                     .Where(x => x.Genre is not null)
                     .Select(x => new GenreDetailModel
@@ -99,48 +99,5 @@ public class GameTitleModelMapper
             Publisher = model.Publisher,
             ReleaseDate = model.ReleaseDate,
             IsAvailable = model.IsAvailable
-        };
-    
-    public GameTitleGenreEntity MapGenreToEntity(Guid gameTitleId, Guid genreId)
-        => new()
-        {
-            GameTitleId = gameTitleId,
-            GenreId = genreId,
-            GameTitle = null!,
-            Genre = null!
-        };
-
-    public GameTitlePlatformEntity MapPlatformToEntity(Guid gameTitleId, Guid platformId)
-        => new()
-        {
-            GameTitleId = gameTitleId,
-            PlatformId = platformId,
-            GameTitle = null!,
-            Platform = null!
-        };
-
-    public AchievementEntity MapAchievementToEntity(AchievementDetailModel model, Guid gameTitleId)
-        => new()
-        {
-            Id = model.Id,
-            GameTitleId = gameTitleId,
-            Name = model.Name,
-            Description = model.Description,
-            Points = model.Points,
-            GameTitle = null!
-        };
-
-    public ReviewEntity MapReviewToEntity(ReviewDetailModel model, Guid gameTitleId)
-        => new()
-        {
-            Id = model.Id,
-            GameTitleId = gameTitleId,
-            UserId = model.UserId,
-            Rating = model.Rating,
-            Text = model.Text,
-            CreatedAt = model.CreatedAt,
-            UpdatedAt = model.UpdatedAt,
-            GameTitle = null!,
-            User = null!
         };
 }

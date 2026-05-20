@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:views="clr-namespace:Launcher.App.Views"
+                       xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       x:Class="Launcher.App.Views.GameTitleEditPage"
+                       x:DataType="vm:GameTitleEditViewModel"
+                       BackgroundColor="#352A2A"
+                       Shell.NavBarIsVisible="False"
+                       Shell.TabBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+        <views:NavigationBarView Grid.Row="0" ActiveTab="Obchod" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="16">
+
+                <Label Text="{Binding PageTitle}"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="White" />
+
+                <Border BackgroundColor="#403535"
+                        Padding="16"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="12">
+
+                        <Label Text="Name" TextColor="White" />
+                        <Entry Text="{Binding GameTitle.Name}"
+                               Placeholder="Game name"
+                               TextColor="White"
+                               PlaceholderColor="#AAAAAA"
+                               BackgroundColor="#4A4040" />
+
+                        <Label Text="Description" TextColor="White" />
+                        <Editor Text="{Binding GameTitle.Description}"
+                                Placeholder="Game description"
+                                TextColor="White"
+                                PlaceholderColor="#AAAAAA"
+                                BackgroundColor="#4A4040"
+                                AutoSize="TextChanges"
+                                HeightRequest="140" />
+
+                        <Label Text="PEGI Rating" TextColor="White" />
+                        <Entry Text="{Binding GameTitle.PegiRating}"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#4A4040" />
+
+                        <Label Text="Price (cents)" TextColor="White" />
+                        <Entry Text="{Binding GameTitle.PriceCents}"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#4A4040" />
+
+                        <Label Text="Cover Image URL" TextColor="White" />
+                        <Entry Text="{Binding GameTitle.CoverImageUrl}"
+                               Placeholder="https://..."
+                               TextColor="White"
+                               PlaceholderColor="#AAAAAA"
+                               BackgroundColor="#4A4040" />
+
+                        <Label Text="Publisher" TextColor="White" />
+                        <Entry Text="{Binding GameTitle.Publisher}"
+                               Placeholder="Publisher"
+                               TextColor="White"
+                               PlaceholderColor="#AAAAAA"
+                               BackgroundColor="#4A4040" />
+
+                        <Label Text="Release Date" TextColor="White" />
+                        <DatePicker Date="{Binding GameTitle.ReleaseDate}" />
+
+                        <HorizontalStackLayout Spacing="12">
+                            <Label Text="Available"
+                                   TextColor="White"
+                                   VerticalOptions="Center" />
+                            <Switch IsToggled="{Binding GameTitle.IsAvailable}" />
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="12" Margin="0,12,0,0">
+                            <Button Text="Save"
+                                    Command="{Binding SaveCommand}"
+                                    BackgroundColor="#AA3333"
+                                    TextColor="White" />
+
+                            <Button Text="Cancel"
+                                    Command="{Binding CancelCommand}"
+                                    BackgroundColor="#4A4444"
+                                    TextColor="White" />
+                            
+                            <Button Text="Delete"
+                                    Command="{Binding DeleteCommand}"
+                                    IsVisible="{Binding CanDelete}"
+                                    BackgroundColor="#4A4444"
+                                    TextColor="White" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</views:ContentPageBase>
