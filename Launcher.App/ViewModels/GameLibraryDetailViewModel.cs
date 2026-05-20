@@ -31,7 +31,7 @@ public partial class GameLibraryDetailViewModel(
     private GameTitleDetailModel? _gameTitle;
 
     [ObservableProperty]
-    private LibraryTitleEntity? _libraryTitle;
+    private LibraryTitleListModel? _libraryTitle;
 
     public string PriceInEurosText
         => LibraryTitle is null
@@ -49,7 +49,7 @@ public partial class GameLibraryDetailViewModel(
     public string FavoriteIconColor
         => LibraryTitle?.IsFavorite == true ? "#FFD700" : "#333333";
 
-    partial void OnLibraryTitleChanged(LibraryTitleEntity? value)
+    partial void OnLibraryTitleChanged(LibraryTitleListModel? value)
     {
         OnPropertyChanged(nameof(PriceInEurosText));
         OnPropertyChanged(nameof(FavoriteIcon));

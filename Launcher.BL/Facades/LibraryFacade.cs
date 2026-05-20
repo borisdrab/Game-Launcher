@@ -21,42 +21,66 @@ namespace Launcher.BL.Facades
     {
         public async Task<LibraryListModel> FilterAsync(Guid userId, string? gameName, string? sortBy, bool ascending, params string[] genres)
         {
-            var query = libraryRepository.Get()
-                .Include(l => l.LibraryTitles)
-                    .ThenInclude(lt => lt.GameTitle)
-                        .ThenInclude(gt => gt!.GameTitleGenres)
-                            .ThenInclude(gtg => gtg.Genre)
-                .Where(lib => lib.UserId == userId);
+            var libraryEntity = await libraryRepository.Get()
+                .AsNoTracking()
+                .Include(l => l.User)
+                .FirstOrDefaultAsync(lib => lib.UserId == userId);
 
-            LibraryEntity? userLibrary = await query.FirstOrDefaultAsync();
-            if (userLibrary == null) return LibraryListModel.Empty;
+            if (libraryEntity == null) return LibraryListModel.Empty;
 
-            var filteredTitles = userLibrary.LibraryTitles.AsEnumerable();
+            var query = ctx.LibraryTitles
+                .AsNoTracking()
+                .Include(lt => lt.GameTitle)
+                    .ThenInclude(gt => gt!.GameTitleGenres)
+                        .ThenInclude(gtg => gtg.Genre)
+                .Where(lt => lt.LibraryId == libraryEntity.Id);
 
             if (!string.IsNullOrWhiteSpace(gameName))
             {
-                filteredTitles = filteredTitles.Where(lt => lt.GameTitle?.Name.Contains(gameName, StringComparison.OrdinalIgnoreCase) == true);
+                query = query.Where(lt => lt.GameTitle!.Name.Contains(gameName));
             }
 
             if (genres is { Length: > 0 })
             {
-                filteredTitles = filteredTitles.Where(lt => 
-                    lt.GameTitle?.GameTitleGenres?.Any(gtg => 
-                        gtg.Genre != null && genres.Any(g => string.Equals(g, gtg.Genre.Name, StringComparison.OrdinalIgnoreCase))) == true);
+                query = query.Where(lt => 
+                    lt.GameTitle!.GameTitleGenres.Any(gtg => 
+                        genres.Contains(gtg.Genre!.Name)));
             }
 
-            filteredTitles = (sortBy?.ToLower(), ascending) switch
+            query = (sortBy?.ToLower(), ascending) switch
             {
-                ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty),
-                ("name", false) => filteredTitles.OrderByDescending(lt => lt.GameTitle?.Name ?? string.Empty),
-                ("addedat", true) => filteredTitles.OrderBy(lt => lt.AddedAt),
-                ("addedat", false) => filteredTitles.OrderByDescending(lt => lt.AddedAt),
-                _ => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty)
+                ("name", true) => query.OrderBy(lt => lt.GameTitle!.Name),
+                ("name", false) => query.OrderByDescending(lt => lt.GameTitle!.Name),
+                ("addedat", true) => query.OrderBy(lt => lt.AddedAt),
+                ("addedat", false) => query.OrderByDescending(lt => lt.AddedAt),
+                _ => query.OrderBy(lt => lt.GameTitle!.Name)
             };
 
-            userLibrary.LibraryTitles = filteredTitles.ToList();
+            var filteredTitles = await query.ToListAsync();
 
-            return _mapper.MapToListModel(userLibrary);
+            var listModel = _mapper.MapToListModel(libraryEntity);
+            
+            listModel.LibraryTitles = filteredTitles.Select(lt => new LibraryTitleListModel
+            {
+                LibraryId = lt.LibraryId,
+                GameTitleId = lt.GameTitleId,
+                AddedAt = lt.AddedAt,
+                IsFavorite = lt.IsFavorite,
+                PriceCentsAtPurchase = lt.PriceCentsAtPurchase,
+                GameTitle = lt.GameTitle is null ? null : new GameTitleListModel
+                {
+                    Id = lt.GameTitle.Id,
+                    Name = lt.GameTitle.Name,
+                    PegiRating = lt.GameTitle.PegiRating,
+                    PriceCents = lt.GameTitle.PriceCents,
+                    CoverImageUrl = lt.GameTitle.CoverImageUrl,
+                    Publisher = lt.GameTitle.Publisher,
+                    ReleaseDate = lt.GameTitle.ReleaseDate,
+                    IsAvailable = lt.GameTitle.IsAvailable
+                }
+            }).ToList();
+
+            return listModel;
         }
 
         public override async Task<LibraryDetailModel?> GetAsync(Guid id)

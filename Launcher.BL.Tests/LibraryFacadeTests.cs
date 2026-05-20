@@ -145,7 +145,7 @@ public class LibraryFacadeTests : FacadeTestsBase
         // Assert
         // Elden Ring is Action RPG
         result.LibraryTitles.Should().NotBeEmpty();
-        result.LibraryTitles.All(lt => lt.GameTitle!.GameTitleGenres.Any(gtg => gtg.Genre!.Name == "RPG")).Should().BeTrue();
+        result.LibraryTitles.All(lt => lt.GameTitle!.Name == GameTitleSeeds.EldenRing.Name).Should().BeTrue();
     }
 
     [Fact]
