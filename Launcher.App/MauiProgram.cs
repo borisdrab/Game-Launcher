@@ -7,6 +7,8 @@ using Launcher.DAL.Seeds;
 using Launcher.DAL.Migrator;
 using Microsoft.EntityFrameworkCore;
 
+using System.IO;
+
 namespace Launcher.App;
 
 public static class MauiProgram
@@ -24,7 +26,8 @@ public static class MauiProgram
             });
 
         builder.Services
-            .AddDALServices("launcher.db")
+            //.AddDALServices("launcher.db") comment for my MacCatalyst error
+            .AddDALServices(Path.Combine(FileSystem.AppDataDirectory, "launcher.db"))
             .AddBLServices()
             .AddAppServices();
 

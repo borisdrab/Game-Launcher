@@ -15,15 +15,27 @@ public class NavigationService : INavigationService
     public const string GameEditRouteRelative = "game-edit";
     public const string LibraryDetailRouteRelative = "library-detail";
 
+    public const string UserEditRoute = "useredit";
+
+    public const string ReviewDetailRouteRelative = "review-detail";
+    public const string ReviewEditRouteRelative = "review-edit";
+
     public IEnumerable<RouteModel> Routes { get; } = new List<RouteModel>
     {
         new(GameListRouteAbsolute, typeof(GameTitleListPage)),
         new(LibraryListRouteAbsolute, typeof(GameLibraryListPage)),
-        new(SocialsRouteAbsolute, typeof(SocialsPlaceholderPage)),
-        new(UserListRouteAbsolute, typeof(UserPlaceholderPage)),
+        new(SocialsRouteAbsolute, typeof(SocialsPage)),
+        new(UserListRouteAbsolute, typeof(UserListPage)),
+
+        new(UserEditRoute, typeof(UserEditPage)),
+
         new(GameDetailRouteRelative, typeof(GameTitleDetailPage)),
         new(GameEditRouteRelative, typeof(GameTitleEditPage)),
+
         new(LibraryDetailRouteRelative, typeof(GameLibraryDetailPage)),
+
+        new(ReviewDetailRouteRelative, typeof(ReviewDetailPage)),
+        new(ReviewEditRouteRelative, typeof(ReviewEditPage)),
     };
 
     public async Task GoToAsync(string route)

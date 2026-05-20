@@ -8,13 +8,13 @@
        Shell.NavBarIsVisible="False"
        Shell.TabBarIsVisible="False">
 
+    <ShellContent Route="users"
+                  ContentTemplate="{DataTemplate views:UserListPage}" />
     <ShellContent Route="games"
                   ContentTemplate="{DataTemplate views:GameTitleListPage}" />
     <ShellContent Route="library"
                   ContentTemplate="{DataTemplate views:GameLibraryListPage}" />
     <ShellContent Route="socials"
-                  ContentTemplate="{DataTemplate views:SocialsPlaceholderPage}" />
-    <ShellContent Route="users"
-                  ContentTemplate="{DataTemplate views:UserPlaceholderPage}" />
+                  ContentTemplate="{DataTemplate views:SocialsPage}" />
 
 </Shell>

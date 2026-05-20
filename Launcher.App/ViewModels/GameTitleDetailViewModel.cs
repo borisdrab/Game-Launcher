@@ -76,6 +76,7 @@ public partial class GameTitleDetailViewModel(
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
+        // TODO: use ICurrentUserService instead of hardcoded Jan
         IsInLibrary = await libraryFacade.IsGameInLibraryAsync(Launcher.DAL.Seeds.UserSeeds.Jan.Id, Id);
 
         var libraries = await libraryFacade.GetAsync();
@@ -135,9 +136,10 @@ public partial class GameTitleDetailViewModel(
 
         try
         {
+            // TODO: use ICurrentUserService instead of hardcoded Jan
             await libraryFacade.AddGameToLibraryAsync(Launcher.DAL.Seeds.UserSeeds.Jan.Id, Id);
             IsInLibrary = true;
-            
+
             var libraries = await libraryFacade.GetAsync();
             var userLibrary = libraries.FirstOrDefault(l => l.UserId == Launcher.DAL.Seeds.UserSeeds.Jan.Id);
             if (userLibrary != null)
@@ -165,6 +167,7 @@ public partial class GameTitleDetailViewModel(
         }
 
         var libraries = await libraryFacade.GetAsync();
+        // TODO: use ICurrentUserService instead of hardcoded Jan
         var userLibrary = libraries.FirstOrDefault(l => l.UserId == Launcher.DAL.Seeds.UserSeeds.Jan.Id);
         if (userLibrary != null)
         {

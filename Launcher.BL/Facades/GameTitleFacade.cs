@@ -2,21 +2,28 @@ using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Mappers;
 using Launcher.BL.Models;
 using Launcher.BL.Repositories;
-using Launcher.BL.Repositories.Interfaces;
-using Launcher.DAL.Entities;
 using Launcher.DAL.Context;
+using Launcher.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Launcher.BL.Facades;
 
 public class GameTitleFacade(
-    LauncherDbContext ctx,
-    IGameTitleRepository gameTitleRepository,
+    IDbContextFactory<LauncherDbContext> dbContextFactory,
     GameTitleModelMapper mapper)
     : FacadeBase<GameTitleEntity, GameTitleListModel, GameTitleDetailModel>(mapper), IGameTitleFacade
 {
     public override async Task<IEnumerable<GameTitleListModel>> GetAsync()
-        => mapper.MapToListModel(await gameTitleRepository.Get().OrderBy(g => g.Name).ToListAsync());
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entities = await dbContext.GameTitles
+            .AsNoTracking()
+            .OrderBy(g => g.Name)
+            .ToListAsync();
+
+        return mapper.MapToListModel(entities);
+    }
 
     public async Task<IEnumerable<GameTitleListModel>> GetAsync(
         string? searchTerm,
@@ -27,10 +34,59 @@ public class GameTitleFacade(
         GameTitleSortBy? sortBy,
         bool descending)
     {
-        return mapper.MapToListModel(
-            await gameTitleRepository
-                .GetQuery(searchTerm, pegiRating, isAvailable, publisher, genreIds, sortBy, descending)
-                .ToListAsync());
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        IQueryable<GameTitleEntity> query = dbContext.GameTitles
+            .AsNoTracking()
+            .Include(x => x.GameTitleGenres);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            string loweredSearch = searchTerm.ToLower();
+            query = query.Where(x =>
+                x.Name.ToLower().Contains(loweredSearch) ||
+                x.Description.ToLower().Contains(loweredSearch));
+        }
+
+        if (pegiRating.HasValue)
+        {
+            query = query.Where(x => x.PegiRating == pegiRating.Value);
+        }
+
+        if (isAvailable.HasValue)
+        {
+            query = query.Where(x => x.IsAvailable == isAvailable.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(publisher))
+        {
+            query = query.Where(x => x.Publisher.Contains(publisher));
+        }
+
+        if (genreIds is not null && genreIds.Any())
+        {
+            query = query.Where(x => x.GameTitleGenres.Any(gtg => genreIds.Contains(gtg.GenreId)));
+        }
+
+        query = (sortBy, descending) switch
+        {
+            (GameTitleSortBy.Name, false) => query.OrderBy(x => x.Name),
+            (GameTitleSortBy.Name, true) => query.OrderByDescending(x => x.Name),
+
+            (GameTitleSortBy.PegiRating, false) => query.OrderBy(x => x.PegiRating),
+            (GameTitleSortBy.PegiRating, true) => query.OrderByDescending(x => x.PegiRating),
+
+            (GameTitleSortBy.PriceCents, false) => query.OrderBy(x => x.PriceCents),
+            (GameTitleSortBy.PriceCents, true) => query.OrderByDescending(x => x.PriceCents),
+
+            (GameTitleSortBy.ReleaseDate, false) => query.OrderBy(x => x.ReleaseDate),
+            (GameTitleSortBy.ReleaseDate, true) => query.OrderByDescending(x => x.ReleaseDate),
+
+            _ => query.OrderBy(x => x.Name)
+        };
+
+        var entities = await query.ToListAsync();
+        return mapper.MapToListModel(entities);
     }
 
     public Task<IEnumerable<GameTitleListModel>> GetAsync(QueryObject query)
@@ -56,8 +112,10 @@ public class GameTitleFacade(
 
     public override async Task<GameTitleDetailModel?> GetAsync(Guid id)
     {
-        GameTitleEntity? entity = await gameTitleRepository
-            .Get()
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = await dbContext.GameTitles
+            .AsNoTracking()
             .Include(x => x.GameTitleGenres)
                 .ThenInclude(x => x.Genre)
             .Include(x => x.GameTitlePlatforms)
@@ -68,7 +126,7 @@ public class GameTitleFacade(
 
         return entity is null ? null : mapper.MapToDetailModel(entity);
     }
-    
+
     public override async Task<Guid> SaveAsync(GameTitleDetailModel model)
     {
         if (model.Genres.Count > 0 ||
@@ -78,24 +136,52 @@ public class GameTitleFacade(
         {
             throw new InvalidOperationException("SaveAsync supports only scalar GameTitle properties.");
         }
-        GameTitleEntity entity = mapper.MapToEntity(model);
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = mapper.MapToEntity(model);
 
         if (model.Id == Guid.Empty)
         {
             entity.Id = Guid.NewGuid();
-            gameTitleRepository.Insert(entity);
-            await ctx.SaveChangesAsync();
+            await dbContext.GameTitles.AddAsync(entity);
+            await dbContext.SaveChangesAsync();
             return entity.Id;
         }
 
-        await gameTitleRepository.UpdateAsync(entity);
-        await ctx.SaveChangesAsync();
-        return entity.Id;
+        var existingEntity = await dbContext.GameTitles
+            .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+        if (existingEntity is null)
+        {
+            throw new InvalidOperationException($"GameTitle with ID {model.Id} was not found.");
+        }
+
+        existingEntity.Name = entity.Name;
+        existingEntity.Description = entity.Description;
+        existingEntity.PegiRating = entity.PegiRating;
+        existingEntity.PriceCents = entity.PriceCents;
+        existingEntity.CoverImageUrl = entity.CoverImageUrl;
+        existingEntity.Publisher = entity.Publisher;
+        existingEntity.ReleaseDate = entity.ReleaseDate;
+        existingEntity.IsAvailable = entity.IsAvailable;
+
+        await dbContext.SaveChangesAsync();
+        return existingEntity.Id;
     }
 
     public override async Task DeleteAsync(Guid id)
     {
-        await gameTitleRepository.DeleteAsync(id);
-        await ctx.SaveChangesAsync();
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var entity = await dbContext.GameTitles.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (entity is null)
+        {
+            throw new InvalidOperationException($"GameTitle with ID {id} was not found.");
+        }
+
+        dbContext.GameTitles.Remove(entity);
+        await dbContext.SaveChangesAsync();
     }
 }

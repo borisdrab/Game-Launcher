@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:views="clr-namespace:Launcher.App.Views"
+                       xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       xmlns:models="clr-namespace:Launcher.App.Models"
+                       x:Class="Launcher.App.Views.SocialsPage"
+                       x:DataType="vm:SocialsViewModel"
+                       x:Name="SocialsRoot"
+                       Shell.NavBarIsVisible="False"
+                       Shell.TabBarIsVisible="False"
+                       Title="Socials"
+                       BackgroundColor="#352A2A">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- TOP NAVIGATION BAR -->
+        <views:NavigationBarView Grid.Row="0" ActiveTab="Socials" />
+
+        <!-- CONTENT -->
+        <Grid Grid.Row="1" ColumnDefinitions="200, *">
+
+            <!-- LEFT SIDEBAR -->
+            <Border Grid.Column="0"
+                    BackgroundColor="#6A6666"
+                    Stroke="Black"
+                    StrokeThickness="2">
+                <ScrollView>
+                    <VerticalStackLayout Padding="14,18" Spacing="14">
+
+                        <!-- Search Bar -->
+                        <Border BackgroundColor="#DDDDDD"
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                Padding="0"
+                                HeightRequest="44">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="20" />
+                            </Border.StrokeShape>
+
+                            <Grid ColumnDefinitions="*,Auto" Padding="14,0">
+                                <Entry Grid.Column="0"
+                                       Text="{Binding SearchText}"
+                                       Placeholder="Search"
+                                       PlaceholderColor="#777777"
+                                       TextColor="#555555"
+                                       BackgroundColor="Transparent"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="⌕"
+                                       FontSize="24"
+                                       TextColor="#777777"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Add Review Button -->
+                        <Button Text="+ Add Review"
+                                Command="{Binding GoToCreateCommand}"
+                                BackgroundColor="#AA3333"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                Margin="2,12,2,0"
+                                HeightRequest="42" />
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Border>
+
+            <!-- REVIEWS LIST -->
+            <ScrollView Grid.Column="1">
+                <CollectionView ItemsSource="{Binding Reviews}"
+                                Margin="14"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
+
+                    <!-- Empty state -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Spacing="8"
+                                             Padding="0,80">
+                            <Label Text="No reviews yet"
+                                   FontSize="20"
+                                   TextColor="#AA8888"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Be the first to add a review!"
+                                   FontSize="14"
+                                   TextColor="#776666"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ReviewDisplayItem">
+                            <Border BackgroundColor="#4A4040"
+                                    Stroke="#5A5050"
+                                    StrokeThickness="1"
+                                    Padding="14,10">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+
+                                <!-- Tap to view detail -->
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={x:Reference SocialsRoot}, Path=BindingContext.GoToDetailCommand}"
+                                        CommandParameter="{Binding Id}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="*, Auto, Auto, Auto" ColumnSpacing="12">
+                                    <!-- Game name (title of the row) -->
+                                    <Label Grid.Column="0"
+                                           Text="{Binding GameName}"
+                                           TextColor="White"
+                                           FontSize="16"
+                                           VerticalOptions="Center"
+                                           LineBreakMode="TailTruncation" />
+
+                                    <!-- Rating with stars -->
+                                    <Label Grid.Column="1"
+                                           TextColor="#FFCC33"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="★ " />
+                                                <Span Text="{Binding Rating}" />
+                                                <Span Text="/5" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Author -->
+                                    <Label Grid.Column="2"
+                                           TextColor="White"
+                                           FontSize="14"
+                                           VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="By: " TextColor="#CCAAAA" />
+                                                <Span Text="{Binding UserName}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Delete button -->
+                                    <Button Grid.Column="3"
+                                            Text="✕"
+                                            FontSize="14"
+                                            FontAttributes="Bold"
+                                            TextColor="White"
+                                            BackgroundColor="#AA3333"
+                                            WidthRequest="32"
+                                            HeightRequest="32"
+                                            Padding="0"
+                                            Command="{Binding Source={x:Reference SocialsRoot}, Path=BindingContext.DeleteCommand}"
+                                            CommandParameter="{Binding Id}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+
+        </Grid>
+    </Grid>
+</views:ContentPageBase>

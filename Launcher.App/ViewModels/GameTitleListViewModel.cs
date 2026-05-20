@@ -20,6 +20,7 @@ public partial class GameTitleListViewModel : ViewModelBase,
     private readonly IGameTitleFacade _gameTitleFacade;
     private readonly IGenreFacade _genreFacade;
     private readonly INavigationService _navigationService;
+    private readonly IAlertService _alertService;
 
     [ObservableProperty]
     private IEnumerable<GameTitleListModel> _games = [];
@@ -28,7 +29,7 @@ public partial class GameTitleListViewModel : ViewModelBase,
 
     [ObservableProperty]
     private string _searchText = string.Empty;
-    
+
     [ObservableProperty]
     private GameTitleSortBy? _selectedSortBy;
 
@@ -41,12 +42,14 @@ public partial class GameTitleListViewModel : ViewModelBase,
         IGameTitleFacade gameTitleFacade,
         IGenreFacade genreFacade,
         INavigationService navigationService,
+        IAlertService alertService,
         IMessengerService messengerService)
         : base(messengerService)
     {
         _gameTitleFacade = gameTitleFacade;
         _genreFacade = genreFacade;
         _navigationService = navigationService;
+        _alertService = alertService;
 
         Genres.CollectionChanged += Genres_CollectionChanged;
     }
@@ -141,13 +144,13 @@ public partial class GameTitleListViewModel : ViewModelBase,
             SelectedSortBy,
             SortDescending);
     }
-    
+
     [RelayCommand]
     private async Task ToggleFavoriteAsync(Guid id)
     {
         await Task.CompletedTask;
     }
-    
+
     partial void OnSelectedSortByChanged(GameTitleSortBy? value)
     {
         SearchCommand.Execute(null);
