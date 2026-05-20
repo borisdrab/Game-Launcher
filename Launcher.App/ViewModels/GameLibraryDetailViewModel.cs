@@ -6,7 +6,6 @@ using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
 using Launcher.DAL.Entities;
-using Launcher.DAL.Seeds;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +21,7 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
     private readonly ILibraryFacade _libraryFacade;
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
+    private readonly ICurrentUserService _currentUserService;
 
     public Guid GameTitleId { get; set; }
 
@@ -63,6 +63,7 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
         IGameTitleFacade gameTitleFacade,
         ILibraryFacade libraryFacade,
         INavigationService navigationService,
+        ICurrentUserService currentUserService,
         IMessengerService messengerService,
         IAlertService alertService)
         : base(messengerService)
@@ -70,6 +71,7 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
         _gameTitleFacade = gameTitleFacade;
         _libraryFacade = libraryFacade;
         _navigationService = navigationService;
+        _currentUserService = currentUserService;
         _alertService = alertService;
     }
 
@@ -77,12 +79,15 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
     {
         await base.LoadDataAsync();
 
+        await _currentUserService.EnsureCurrentUserAsync();
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         GameTitle = await _gameTitleFacade.GetAsync(GameTitleId)
                     ?? GameTitleDetailModel.Empty;
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
-        var library = await _libraryFacade.FilterAsync(UserSeeds.Jan.Id, null, null, true);
+        var library = await _libraryFacade.FilterAsync(userId, null, null, true);
         if (library != null && library.LibraryTitles != null)
         {
             LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);
@@ -96,7 +101,8 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
         {
             await _libraryFacade.ToggleFavoriteAsync(LibraryTitle.LibraryId, GameTitleId);
             
-            var library = await _libraryFacade.FilterAsync(UserSeeds.Jan.Id, null, null, true);
+            var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+            var library = await _libraryFacade.FilterAsync(userId, null, null, true);
             if (library != null && library.LibraryTitles != null)
             {
                 LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);

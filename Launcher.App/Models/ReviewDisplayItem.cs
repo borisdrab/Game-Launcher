@@ -10,5 +10,6 @@ public class ReviewDisplayItem
     public string GameName { get; init; } = string.Empty;
     public string UserName { get; init; } = string.Empty;
     public int Rating { get; init; }
+    public string? Text { get; init; }
     public DateTime CreatedAt { get; init; }
 }

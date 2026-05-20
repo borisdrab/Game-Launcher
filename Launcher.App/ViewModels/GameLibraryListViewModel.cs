@@ -5,7 +5,6 @@ using Launcher.App.Messages;
 using Launcher.App.Models;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
-using Launcher.DAL.Seeds;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +27,7 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     private readonly ILibraryFacade _libraryFacade;
     private readonly IGenreFacade _genreFacade;
     private readonly INavigationService _navigationService;
+    private readonly ICurrentUserService _currentUserService;
 
     [ObservableProperty]
     private IEnumerable<LibraryItemModel> _libraryItems = [];
@@ -49,12 +49,14 @@ public partial class GameLibraryListViewModel : ViewModelBase,
         ILibraryFacade libraryFacade,
         IGenreFacade genreFacade,
         INavigationService navigationService,
+        ICurrentUserService currentUserService,
         IMessengerService messengerService)
         : base(messengerService)
     {
         _libraryFacade = libraryFacade;
         _genreFacade = genreFacade;
         _navigationService = navigationService;
+        _currentUserService = currentUserService;
 
         Genres.CollectionChanged += Genres_CollectionChanged;
     }
@@ -62,6 +64,9 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
+
+        // Make sure a user is selected (defaults to first user in DB)
+        await _currentUserService.EnsureCurrentUserAsync();
 
         if (Genres.Count == 0)
         {
@@ -142,7 +147,7 @@ public partial class GameLibraryListViewModel : ViewModelBase,
         };
 
         var library = await _libraryFacade.FilterAsync(
-            UserSeeds.Jan.Id,
+            _currentUserService.CurrentUser?.Id ?? Guid.Empty,
             string.IsNullOrWhiteSpace(SearchText) ? null : SearchText,
             sortBy,
             !SortDescending,
@@ -174,7 +179,8 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     private async Task ToggleFavoriteAsync(Guid gameTitleId)
     {
         var libraries = await _libraryFacade.GetAsync();
-        var userLibrary = libraries.FirstOrDefault(l => l.UserId == UserSeeds.Jan.Id);
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+        var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {
             await _libraryFacade.ToggleFavoriteAsync(userLibrary.Id, gameTitleId);

@@ -44,6 +44,12 @@
                                 BackgroundColor="Transparent"
                                 VerticalOptions="Fill" />
                     </Border>
+
+                    <!-- Empty library hint -->
+                    <Label Text="You don't own any games yet. Buy games in the Obchod tab to be able to review them."
+                           TextColor="#FFAA66"
+                           FontSize="12"
+                           IsVisible="{Binding HasNoGames}" />
                 </VerticalStackLayout>
 
                 <!-- Author (read-only, shows current user) -->

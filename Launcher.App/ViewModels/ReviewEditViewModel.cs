@@ -12,6 +12,7 @@ public partial class ReviewEditViewModel : ViewModelBase
 {
     private readonly IReviewFacade _reviewFacade;
     private readonly IGameTitleFacade _gameTitleFacade;
+    private readonly ILibraryFacade _libraryFacade;
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
     private readonly ICurrentUserService _currentUserService;
@@ -23,10 +24,13 @@ public partial class ReviewEditViewModel : ViewModelBase
     [ObservableProperty]
     private ReviewDetailModel _review = new();
 
-    // List of games the user can review
-    // TODO: filter by user's library when library functionality is merged
+    // List of games the current user can review (filtered by their library)
     [ObservableProperty]
     private IEnumerable<GameTitleListModel> _games = [];
+
+    // True when user has no games in their library (used for empty-state hint)
+    [ObservableProperty]
+    private bool _hasNoGames;
 
     // Currently selected game
     [ObservableProperty]
@@ -49,6 +53,7 @@ public partial class ReviewEditViewModel : ViewModelBase
     public ReviewEditViewModel(
         IReviewFacade reviewFacade,
         IGameTitleFacade gameTitleFacade,
+        ILibraryFacade libraryFacade,
         INavigationService navigationService,
         IAlertService alertService,
         ICurrentUserService currentUserService,
@@ -57,6 +62,7 @@ public partial class ReviewEditViewModel : ViewModelBase
     {
         _reviewFacade = reviewFacade;
         _gameTitleFacade = gameTitleFacade;
+        _libraryFacade = libraryFacade;
         _navigationService = navigationService;
         _alertService = alertService;
         _currentUserService = currentUserService;
@@ -70,13 +76,14 @@ public partial class ReviewEditViewModel : ViewModelBase
         await _currentUserService.EnsureCurrentUserAsync();
         AuthorName = _currentUserService.CurrentUser?.DisplayName ?? "(no user selected)";
 
-        // Load games for the picker
-        Games = await _gameTitleFacade.GetAsync();
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
 
         if (Id != Guid.Empty)
         {
-            // Edit mode - load existing review
+            // Edit mode - load existing review and show ALL games
+            // (so the originally reviewed game is visible even if not in current user's library)
             Review = await _reviewFacade.GetAsync(Id) ?? new ReviewDetailModel();
+            Games = await _gameTitleFacade.GetAsync();
 
             SelectedGame = Games.FirstOrDefault(g => g.Id == Review.GameTitleId);
             Rating = Review.Rating;
@@ -84,12 +91,21 @@ public partial class ReviewEditViewModel : ViewModelBase
         }
         else
         {
-            // Create mode - sensible defaults
+            // Create mode - only show games the user owns in their library
+            var library = await _libraryFacade.FilterAsync(userId, null, null, true);
+            var libraryGameIds = library?.LibraryTitles?
+                .Select(lt => lt.GameTitleId)
+                .ToHashSet() ?? new HashSet<Guid>();
+
+            var allGames = await _gameTitleFacade.GetAsync();
+            Games = allGames.Where(g => libraryGameIds.Contains(g.Id)).ToList();
+
             Review = new ReviewDetailModel();
             Rating = 5;
             ReviewText = string.Empty;
         }
 
+        HasNoGames = !Games.Any();
         OnPropertyChanged(nameof(PageTitle));
     }
 

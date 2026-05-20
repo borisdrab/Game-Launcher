@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Launcher.App.Messages;
+using Launcher.App.Models;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
@@ -12,7 +13,9 @@ namespace Launcher.App.ViewModels;
 public partial class GameTitleDetailViewModel(
     IGameTitleFacade gameTitleFacade,
     ILibraryFacade libraryFacade,
+    IUserFacade userFacade,
     INavigationService navigationService,
+    ICurrentUserService currentUserService,
     IMessengerService messengerService,
     IAlertService alertService)
     : ViewModelBase(messengerService),
@@ -23,6 +26,10 @@ public partial class GameTitleDetailViewModel(
 
     [ObservableProperty]
     private GameTitleDetailModel? _gameTitle;
+
+    // Reviews enriched with user names (for display in the list)
+    [ObservableProperty]
+    private IEnumerable<ReviewDisplayItem> _reviewDisplays = [];
 
     [ObservableProperty]
     private bool _isInLibrary;
@@ -71,16 +78,33 @@ public partial class GameTitleDetailViewModel(
     {
         await base.LoadDataAsync();
 
+        await currentUserService.EnsureCurrentUserAsync();
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         GameTitle = await gameTitleFacade.GetAsync(Id)
                     ?? GameTitleDetailModel.Empty;
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
-        // TODO: use ICurrentUserService instead of hardcoded Jan
-        IsInLibrary = await libraryFacade.IsGameInLibraryAsync(Launcher.DAL.Seeds.UserSeeds.Jan.Id, Id);
+        // Build review display list with user names
+        var users = await userFacade.GetAsync();
+        var userNames = users.ToDictionary(u => u.Id, u => u.DisplayName);
+
+        ReviewDisplays = GameTitle.Reviews.Select(r => new ReviewDisplayItem
+        {
+            Id = r.Id,
+            GameTitleId = r.GameTitleId,
+            UserId = r.UserId,
+            UserName = userNames.TryGetValue(r.UserId, out var un) ? un : "Unknown user",
+            Rating = r.Rating,
+            Text = r.Text,
+            CreatedAt = r.CreatedAt
+        }).ToList();
+
+        IsInLibrary = await libraryFacade.IsGameInLibraryAsync(userId, Id);
 
         var libraries = await libraryFacade.GetAsync();
-        var userLibrary = libraries.FirstOrDefault(l => l.UserId == Launcher.DAL.Seeds.UserSeeds.Jan.Id);
+        var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {
             var userLibraryDetail = await libraryFacade.GetAsync(userLibrary.Id);
@@ -136,12 +160,12 @@ public partial class GameTitleDetailViewModel(
 
         try
         {
-            // TODO: use ICurrentUserService instead of hardcoded Jan
-            await libraryFacade.AddGameToLibraryAsync(Launcher.DAL.Seeds.UserSeeds.Jan.Id, Id);
+            var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+            await libraryFacade.AddGameToLibraryAsync(userId, Id);
             IsInLibrary = true;
 
             var libraries = await libraryFacade.GetAsync();
-            var userLibrary = libraries.FirstOrDefault(l => l.UserId == Launcher.DAL.Seeds.UserSeeds.Jan.Id);
+            var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
             if (userLibrary != null)
             {
                 var userLibraryDetail = await libraryFacade.GetAsync(userLibrary.Id);
@@ -167,8 +191,8 @@ public partial class GameTitleDetailViewModel(
         }
 
         var libraries = await libraryFacade.GetAsync();
-        // TODO: use ICurrentUserService instead of hardcoded Jan
-        var userLibrary = libraries.FirstOrDefault(l => l.UserId == Launcher.DAL.Seeds.UserSeeds.Jan.Id);
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+        var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {
             await libraryFacade.ToggleFavoriteAsync(userLibrary.Id, Id);

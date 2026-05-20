@@ -4,6 +4,7 @@
                        xmlns:views="clr-namespace:Launcher.App.Views"
                        xmlns:vm="clr-namespace:Launcher.App.ViewModels"
                        xmlns:m="clr-namespace:Launcher.BL.Models;assembly=Launcher.BL"
+                       xmlns:appmodels="clr-namespace:Launcher.App.Models"
                        x:Class="Launcher.App.Views.GameTitleDetailPage"
                        x:DataType="vm:GameTitleDetailViewModel"
                        BackgroundColor="#352A2A"
@@ -310,7 +311,7 @@
                        FontSize="26"
                        FontAttributes="Bold" />
 
-                <CollectionView ItemsSource="{Binding GameTitle.Reviews}"
+                <CollectionView ItemsSource="{Binding ReviewDisplays}"
                                 SelectionMode="None"
                                 HeightRequest="100">
                     <CollectionView.EmptyView>
@@ -320,7 +321,7 @@
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="m:ReviewDetailModel">
+                        <DataTemplate x:DataType="appmodels:ReviewDisplayItem">
                             <Label TextColor="Black"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
@@ -330,6 +331,9 @@
                                               FontAttributes="Bold" />
                                         <Span Text=" " />
                                         <Span Text="{Binding Text}" />
+                                        <Span Text=" - " />
+                                        <Span Text="{Binding UserName}"
+                                              FontAttributes="Italic" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
