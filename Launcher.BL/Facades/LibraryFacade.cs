@@ -45,7 +45,6 @@ namespace Launcher.BL.Facades
                         gtg.Genre != null && genres.Any(g => string.Equals(g, gtg.Genre.Name, StringComparison.OrdinalIgnoreCase))) == true);
             }
 
-            // Sorting
             filteredTitles = (sortBy?.ToLower(), ascending) switch
             {
                 ("name", true) => filteredTitles.OrderBy(lt => lt.GameTitle?.Name ?? string.Empty),
@@ -99,5 +98,57 @@ namespace Launcher.BL.Facades
                 .Include(l => l.LibraryTitles)
                 .Include(l => l.User)
                 .ToListAsync());
+
+        public async Task<bool> IsGameInLibraryAsync(Guid userId, Guid gameTitleId)
+        {
+            return await ctx.LibraryTitles.AnyAsync(lt => lt.Library!.UserId == userId && lt.GameTitleId == gameTitleId);
+        }
+
+        public async Task AddGameToLibraryAsync(Guid userId, Guid gameTitleId)
+        {
+            var library = await ctx.Libraries
+                .Include(l => l.LibraryTitles)
+                .FirstOrDefaultAsync(l => l.UserId == userId);
+
+            if (library == null)
+            {
+                library = new LibraryEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Knihovna",
+                    UserId = userId
+                };
+                ctx.Libraries.Add(library);
+            }
+
+            if (!library.LibraryTitles.Any(lt => lt.GameTitleId == gameTitleId))
+            {
+                var game = await ctx.GameTitles.FindAsync(gameTitleId);
+                if (game != null)
+                {
+                    library.LibraryTitles.Add(new LibraryTitleEntity
+                    {
+                        LibraryId = library.Id,
+                        GameTitleId = gameTitleId,
+                        AddedAt = DateTime.UtcNow,
+                        IsFavorite = false,
+                        PriceCentsAtPurchase = game.PriceCents
+                    });
+                    await ctx.SaveChangesAsync();
+                }
+            }
+        }
+
+        public async Task ToggleFavoriteAsync(Guid libraryId, Guid gameTitleId)
+        {
+            var libraryTitle = await ctx.LibraryTitles
+                .FirstOrDefaultAsync(lt => lt.LibraryId == libraryId && lt.GameTitleId == gameTitleId);
+
+            if (libraryTitle != null)
+            {
+                libraryTitle.IsFavorite = !libraryTitle.IsFavorite;
+                await ctx.SaveChangesAsync();
+            }
+        }
     }
 }

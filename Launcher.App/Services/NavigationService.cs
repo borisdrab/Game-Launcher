@@ -13,6 +13,7 @@ public class NavigationService : INavigationService
     
     public const string GameDetailRouteRelative = "game-detail";
     public const string GameEditRouteRelative = "game-edit";
+    public const string LibraryDetailRouteRelative = "library-detail";
 
     public const string UserEditRoute = "useredit";
 
@@ -22,7 +23,7 @@ public class NavigationService : INavigationService
     public IEnumerable<RouteModel> Routes { get; } = new List<RouteModel>
     {
         new(GameListRouteAbsolute, typeof(GameTitleListPage)),
-        new(LibraryListRouteAbsolute, typeof(LibraryPlaceholderPage)),
+        new(LibraryListRouteAbsolute, typeof(GameLibraryListPage)),
         new(SocialsRouteAbsolute, typeof(SocialsPage)),
         new(UserListRouteAbsolute, typeof(UserListPage)),
 
@@ -30,6 +31,8 @@ public class NavigationService : INavigationService
 
         new(GameDetailRouteRelative, typeof(GameTitleDetailPage)),
         new(GameEditRouteRelative, typeof(GameTitleEditPage)),
+
+        new(LibraryDetailRouteRelative, typeof(GameLibraryDetailPage)),
 
         new(ReviewDetailRouteRelative, typeof(ReviewDetailPage)),
         new(ReviewEditRouteRelative, typeof(ReviewEditPage)),

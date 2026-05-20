@@ -13,7 +13,7 @@
     <ShellContent Route="games"
                   ContentTemplate="{DataTemplate views:GameTitleListPage}" />
     <ShellContent Route="library"
-                  ContentTemplate="{DataTemplate views:LibraryPlaceholderPage}" />
+                  ContentTemplate="{DataTemplate views:GameLibraryListPage}" />
     <ShellContent Route="socials"
                   ContentTemplate="{DataTemplate views:SocialsPage}" />
 

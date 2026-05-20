@@ -7,13 +7,10 @@ namespace Launcher.BL.Models
 {
     public class LibraryDetailModel : ModelBase
     {
-
         public string Name { get; set; } = string.Empty;
 
         public Guid UserId { get; set; }
-
         public UserEntity? User { get; set; }
-
 
         public ICollection<LibraryTitleEntity> LibraryTitles { get; set; } = new List<LibraryTitleEntity>();
 
