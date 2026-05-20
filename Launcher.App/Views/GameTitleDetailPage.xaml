@@ -15,7 +15,6 @@
           RowSpacing="0"
           ColumnSpacing="0">
 
-        <!-- HEADER -->
         <Grid Grid.Row="0"
               Grid.ColumnSpan="2">
             <Image Source="{Binding GameTitle.CoverImageUrl}"
@@ -90,7 +89,6 @@
             </Grid>
         </Grid>
 
-        <!-- DESCRIPTION -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="0"
@@ -109,13 +107,12 @@
             </ScrollView>
         </Border>
 
-        <!-- RIGHT PANEL -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="1"
                 BackgroundColor="#6A6666"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
                   Padding="18">
 
                 <Button Grid.Row="0"
@@ -147,7 +144,6 @@
                         <Image Source="{Binding GameTitle.CoverImageUrl}"
                                Aspect="AspectFill" />
 
-                        <!-- FAVOURITE BUTTON -->
                         <Border WidthRequest="42"
                                 HeightRequest="42"
                                 Margin="8"
@@ -201,9 +197,42 @@
                         </Border>
                     </Grid>
                 </Border>
+                
+                <VerticalStackLayout Grid.Row="2"
+                                     Margin="0,12,0,0"
+                                     Spacing="4">
 
-                <!-- GENRES -->
-                <CollectionView Grid.Row="2"
+                    <Label Text="{Binding GameTitle.Publisher, StringFormat='Publisher: {0}'}"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+
+                    <Label Text="{Binding GameTitle.ReleaseDate, StringFormat='Release date: {0:dd.MM.yyyy}'}"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="Platforms:"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center" />
+
+                    <CollectionView ItemsSource="{Binding GameTitle.Platforms}"
+                                    SelectionMode="None"
+                                    HeightRequest="90">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="m:PlatformDetailModel">
+                                <Label Text="{Binding Name}"
+                                       TextColor="White"
+                                       FontSize="14"
+                                       HorizontalTextAlignment="Center" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="3"
                                 Margin="0,18,0,0"
                                 ItemsSource="{Binding GameTitle.Genres}"
                                 SelectionMode="None">
@@ -217,8 +246,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- BUY -->
-                <HorizontalStackLayout Grid.Row="3"
+                <HorizontalStackLayout Grid.Row="4"
                                        Margin="0,18,0,0"
                                        HorizontalOptions="Center"
                                        Spacing="10">
@@ -243,10 +271,9 @@
                     </Border>
                 </HorizontalStackLayout>
 
-                <Grid Grid.Row="4" />
+                <Grid Grid.Row="5" />
 
-                <!-- PEGI AND AVERAGE RATING -->
-                <Grid Grid.Row="5"
+                <Grid Grid.Row="6"
                       ColumnDefinitions="90,*"
                       ColumnSpacing="12"
                       Margin="0,18,0,0"
@@ -296,7 +323,6 @@
             </Grid>
         </Border>
 
-        <!-- REVIEWS -->
         <Border Grid.Row="2"
                 Grid.Column="0"
                 BackgroundColor="#886A6666"
@@ -305,7 +331,7 @@
 
             <VerticalStackLayout Spacing="8">
                 <Label Text="Reviews:"
-                       TextColor="Black"
+                       TextColor="White"
                        FontSize="26"
                        FontAttributes="Bold" />
 
@@ -320,7 +346,7 @@
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="m:ReviewDetailModel">
-                            <Label TextColor="Black"
+                            <Label TextColor="White"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
                                 <Label.FormattedText>
