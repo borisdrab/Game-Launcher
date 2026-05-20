@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Launcher.BL.Facades;
 using Launcher.BL.Mappers;
 using Launcher.BL.Models;
-using Launcher.BL.Repositories;
 using Launcher.DAL.Seeds;
 using Xunit.Abstractions;
 
@@ -14,16 +13,14 @@ public class UserFacadeTests : FacadeTestsBase
 
     public UserFacadeTests(ITestOutputHelper output) : base(output)
     {
-        var ctx = DbContextFactory.CreateDbContext();
-        var repository = new UserRepository(ctx, new UserEntityMapper());
-        _facade = new UserFacade(ctx, repository, new UserModelMapper());
+        _facade = new UserFacade(new UserModelMapper(), DbContextFactory);
     }
 
     [Fact]
     public async Task GetAsync_ReturnsAllSeededUsers()
     {
         // Act
-        var users = await _facade.GetAsync();
+        var users = await _facade.GetAsync();   
         
         // Assert
         users.Should().HaveCount(5);
