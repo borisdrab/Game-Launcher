@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                        xmlns:views="clr-namespace:Launcher.App.Views"
@@ -15,7 +15,6 @@
           RowSpacing="0"
           ColumnSpacing="0">
 
-        <!-- HEADER -->
         <Grid Grid.Row="0"
               Grid.ColumnSpan="2">
             <Image Source="{Binding GameTitle.CoverImageUrl}"
@@ -90,7 +89,6 @@
             </Grid>
         </Grid>
 
-        <!-- DESCRIPTION -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="0"
@@ -109,13 +107,12 @@
             </ScrollView>
         </Border>
 
-        <!-- RIGHT PANEL -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="1"
                 BackgroundColor="#6A6666"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
                   Padding="18">
 
                 <Button Grid.Row="0"
@@ -147,7 +144,6 @@
                         <Image Source="{Binding GameTitle.CoverImageUrl}"
                                Aspect="AspectFill" />
 
-                        <!-- FAVOURITE BUTTON -->
                         <Border WidthRequest="42"
                                 HeightRequest="42"
                                 Margin="8"
@@ -177,22 +173,66 @@
                                 <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{Binding FavoriteIcon}"
-                                   HorizontalOptions="Center"
+                            <Label HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
-                                   TextColor="{Binding FavoriteIconColor}"
+                                   TextColor="#333333"
                                    FontSize="28"
                                    FontAttributes="Bold"
                                    TranslationY="-1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="True">
+                                        <Setter Property="Text" Value="★" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsFavorite}"
+                                                 Value="False">
+                                        <Setter Property="Text" Value="☆" />
+                                    </DataTrigger>
+                                </Label.Triggers>
                             </Label>
                         </Border>
                     </Grid>
                 </Border>
+                
+                <VerticalStackLayout Grid.Row="2"
+                                     Margin="0,12,0,0"
+                                     Spacing="4">
 
-                <!-- GENRES -->
-                <CollectionView Grid.Row="2"
+                    <Label Text="{Binding GameTitle.Publisher, StringFormat='Publisher: {0}'}"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+
+                    <Label Text="{Binding GameTitle.ReleaseDate, StringFormat='Release date: {0:dd.MM.yyyy}'}"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="Platforms:"
+                           TextColor="White"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center" />
+
+                    <CollectionView ItemsSource="{Binding GameTitle.Platforms}"
+                                    SelectionMode="None"
+                                    HeightRequest="90">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="m:PlatformDetailModel">
+                                <Label Text="{Binding Name}"
+                                       TextColor="White"
+                                       FontSize="14"
+                                       HorizontalTextAlignment="Center" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <CollectionView Grid.Row="3"
                                 Margin="0,18,0,0"
                                 ItemsSource="{Binding GameTitle.Genres}"
                                 SelectionMode="None">
@@ -206,40 +246,34 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- BUY -->
-                <HorizontalStackLayout Grid.Row="3"
+                <HorizontalStackLayout Grid.Row="4"
                                        Margin="0,18,0,0"
                                        HorizontalOptions="Center"
                                        Spacing="10">
-                    <Label Text="{Binding PurchaseStatusText}"
+                    <Label Text="Buy:"
                            TextColor="White"
                            FontSize="22"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
 
                     <Border BackgroundColor="#D9D9D9"
-                            Stroke="{Binding PurchaseButtonColor}"
+                            Stroke="#32C852"
                             StrokeThickness="5"
                             Padding="16,4">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BuyCommand}" />
-                        </Border.GestureRecognizers>
-                        
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
 
-                        <Label Text="{Binding PurchasePriceText}"
-                               TextColor="{Binding PurchaseButtonColor}"
+                        <Label Text="{Binding PriceInEurosText}"
+                               TextColor="#32C852"
                                FontSize="24"
                                FontAttributes="Bold" />
                     </Border>
                 </HorizontalStackLayout>
 
-                <Grid Grid.Row="4" />
+                <Grid Grid.Row="5" />
 
-                <!-- PEGI AND AVERAGE RATING -->
-                <Grid Grid.Row="5"
+                <Grid Grid.Row="6"
                       ColumnDefinitions="90,*"
                       ColumnSpacing="12"
                       Margin="0,18,0,0"
@@ -289,7 +323,6 @@
             </Grid>
         </Border>
 
-        <!-- REVIEWS -->
         <Border Grid.Row="2"
                 Grid.Column="0"
                 BackgroundColor="#886A6666"
@@ -298,7 +331,7 @@
 
             <VerticalStackLayout Spacing="8">
                 <Label Text="Reviews:"
-                       TextColor="white"
+                       TextColor="White"
                        FontSize="26"
                        FontAttributes="Bold" />
 
@@ -307,13 +340,13 @@
                                 HeightRequest="100">
                     <CollectionView.EmptyView>
                         <Label Text="No reviews yet"
-                               TextColor="white"
+                               TextColor="Black"
                                FontSize="18" />
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="m:ReviewDetailModel">
-                            <Label TextColor="white"
+                            <Label TextColor="White"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
                                 <Label.FormattedText>

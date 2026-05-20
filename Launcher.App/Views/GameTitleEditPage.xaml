@@ -3,6 +3,7 @@
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                        xmlns:views="clr-namespace:Launcher.App.Views"
                        xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       xmlns:models="clr-namespace:Launcher.App.Models"
                        x:Class="Launcher.App.Views.GameTitleEditPage"
                        x:DataType="vm:GameTitleEditViewModel"
                        BackgroundColor="#352A2A"
@@ -73,6 +74,76 @@
 
                         <Label Text="Release Date" TextColor="White" />
                         <DatePicker Date="{Binding GameTitle.ReleaseDate}" />
+                        
+                        <Label Text="Genres" TextColor="White" />
+                        <CollectionView ItemsSource="{Binding AvailableGenres}"
+                                        SelectionMode="None"
+                                        HeightRequest="180">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical"
+                                                   ItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:SelectableItem">
+                                    <Border BackgroundColor="#E0E0E0"
+                                            Stroke="Black"
+                                            StrokeThickness="2"
+                                            Padding="12,8">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="10">
+                                            <Label Text="{Binding Name}"
+                                                   TextColor="Black"
+                                                   FontAttributes="Bold"
+                                                   VerticalOptions="Center" />
+
+                                            <CheckBox Grid.Column="1"
+                                                      IsChecked="{Binding IsSelected}"
+                                                      VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Label Text="Platforms" TextColor="White" />
+                        <CollectionView ItemsSource="{Binding AvailablePlatforms}"
+                                        SelectionMode="None"
+                                        HeightRequest="180">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical"
+                                                   ItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:SelectableItem">
+                                    <Border BackgroundColor="#E0E0E0"
+                                            Stroke="Black"
+                                            StrokeThickness="2"
+                                            Padding="12,8">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="10">
+                                            <Label Text="{Binding Name}"
+                                                   TextColor="Black"
+                                                   FontAttributes="Bold"
+                                                   VerticalOptions="Center" />
+
+                                            <CheckBox Grid.Column="1"
+                                                      IsChecked="{Binding IsSelected}"
+                                                      VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
 
                         <HorizontalStackLayout Spacing="12">
                             <Label Text="Available"
