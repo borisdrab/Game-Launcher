@@ -65,7 +65,6 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     {
         await base.LoadDataAsync();
 
-        // Make sure a user is selected (defaults to first user in DB)
         await _currentUserService.EnsureCurrentUserAsync();
 
         if (Genres.Count == 0)
@@ -146,8 +145,11 @@ public partial class GameLibraryListViewModel : ViewModelBase,
             _ => null
         };
 
+        await _currentUserService.EnsureCurrentUserAsync();
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         var library = await _libraryFacade.FilterAsync(
-            _currentUserService.CurrentUser?.Id ?? Guid.Empty,
+            userId,
             string.IsNullOrWhiteSpace(SearchText) ? null : SearchText,
             sortBy,
             !SortDescending,
@@ -178,8 +180,10 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     [RelayCommand]
     private async Task ToggleFavoriteAsync(Guid gameTitleId)
     {
-        var libraries = await _libraryFacade.GetAsync();
+        await _currentUserService.EnsureCurrentUserAsync();
         var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+        var libraries = await _libraryFacade.GetAsync();
         var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {
@@ -202,5 +206,6 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     public void Receive(LibraryChangedMessage message)
     {
         ForceDataRefreshOnNextAppearing();
+        _ = ReloadGamesAsync();
     }
 }

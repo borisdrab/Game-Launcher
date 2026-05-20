@@ -18,14 +18,11 @@ public partial class SocialsViewModel : ViewModelBase,
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
 
-    // All reviews loaded from database (before filtering)
     private List<ReviewDisplayItem> _allReviews = new();
 
-    // Reviews shown in the list (after search filter)
     [ObservableProperty]
     private IEnumerable<ReviewDisplayItem> _reviews = [];
 
-    // Search text from the search bar
     [ObservableProperty]
     private string _searchText = string.Empty;
 
@@ -51,14 +48,12 @@ public partial class SocialsViewModel : ViewModelBase,
         await ReloadReviewsAsync();
     }
 
-    // Load all reviews, users, and games, then combine them into display items
     private async Task ReloadReviewsAsync()
     {
         var reviews = await _reviewFacade.GetAsync();
         var users = await _userFacade.GetAsync();
         var games = await _gameTitleFacade.GetAsync();
 
-        // Build lookup dictionaries for quick name lookup by ID
         var userNames = users.ToDictionary(u => u.Id, u => u.DisplayName);
         var gameNames = games.ToDictionary(g => g.Id, g => g.Name);
 
@@ -76,7 +71,6 @@ public partial class SocialsViewModel : ViewModelBase,
         ApplyFilter();
     }
 
-    // Filter reviews by search text (matches game name or user name)
     private void ApplyFilter()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
@@ -126,7 +120,6 @@ public partial class SocialsViewModel : ViewModelBase,
         }
     }
 
-    // Refresh when a review is added/edited/deleted from another page
     public void Receive(ReviewEditMessage message) => ForceDataRefreshOnNextAppearing();
     public void Receive(ReviewDeleteMessage message) => ForceDataRefreshOnNextAppearing();
 }

@@ -37,16 +37,13 @@ public class AchievementFacade
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        // Start building the database query
         IQueryable<AchievementEntity> dbQuery = dbContext.Achievements.AsNoTracking();
 
-        // Search by name if a search term was provided
         if (QueryHelper.HasSearchTerm(query.SearchTerm))
         {
             dbQuery = dbQuery.Where(a => a.Name.Contains(query.SearchTerm!));
         }
 
-        // Sort by name or by points
         if (query.SortBy == "Name")
         {
             dbQuery = QueryHelper.ApplySort(dbQuery, a => a.Name, query.SortDescending);
@@ -56,7 +53,6 @@ public class AchievementFacade
             dbQuery = QueryHelper.ApplySort(dbQuery, a => a.Points, query.SortDescending);
         }
 
-        // Execute the query in the database and return results
         var entities = await dbQuery.ToListAsync();
         return _mapper.MapToListModel(entities);
     }

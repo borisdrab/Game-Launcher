@@ -14,13 +14,10 @@
 
     <Grid RowDefinitions="Auto, *">
 
-        <!-- TOP NAVIGATION BAR -->
         <views:NavigationBarView Grid.Row="0" ActiveTab="Socials" />
 
-        <!-- CONTENT -->
         <Grid Grid.Row="1" ColumnDefinitions="200, *">
 
-            <!-- LEFT SIDEBAR -->
             <Border Grid.Column="0"
                     BackgroundColor="#6A6666"
                     Stroke="Black"
@@ -28,7 +25,6 @@
                 <ScrollView>
                     <VerticalStackLayout Padding="14,18" Spacing="14">
 
-                        <!-- Search Bar -->
                         <Border BackgroundColor="#DDDDDD"
                                 Stroke="Black"
                                 StrokeThickness="2"
@@ -55,7 +51,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- Add Review Button -->
                         <Button Text="+ Add Review"
                                 Command="{Binding GoToCreateCommand}"
                                 BackgroundColor="#AA3333"
@@ -68,7 +63,6 @@
                 </ScrollView>
             </Border>
 
-            <!-- REVIEWS LIST -->
             <ScrollView Grid.Column="1">
                 <CollectionView ItemsSource="{Binding Reviews}"
                                 Margin="14"
@@ -77,7 +71,6 @@
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
                     </CollectionView.ItemsLayout>
 
-                    <!-- Empty state -->
                     <CollectionView.EmptyView>
                         <VerticalStackLayout VerticalOptions="Center"
                                              HorizontalOptions="Center"
@@ -104,7 +97,6 @@
                                     <RoundRectangle CornerRadius="8" />
                                 </Border.StrokeShape>
 
-                                <!-- Tap to view detail -->
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer
                                         Command="{Binding Source={x:Reference SocialsRoot}, Path=BindingContext.GoToDetailCommand}"
@@ -112,7 +104,6 @@
                                 </Border.GestureRecognizers>
 
                                 <Grid ColumnDefinitions="*, Auto, Auto, Auto" ColumnSpacing="12">
-                                    <!-- Game name (title of the row) -->
                                     <Label Grid.Column="0"
                                            Text="{Binding GameName}"
                                            TextColor="White"
@@ -120,7 +111,6 @@
                                            VerticalOptions="Center"
                                            LineBreakMode="TailTruncation" />
 
-                                    <!-- Rating with stars -->
                                     <Label Grid.Column="1"
                                            TextColor="#FFCC33"
                                            FontSize="14"
@@ -135,7 +125,6 @@
                                         </Label.FormattedText>
                                     </Label>
 
-                                    <!-- Author -->
                                     <Label Grid.Column="2"
                                            TextColor="White"
                                            FontSize="14"
@@ -148,7 +137,6 @@
                                         </Label.FormattedText>
                                     </Label>
 
-                                    <!-- Delete button -->
                                     <Button Grid.Column="3"
                                             Text="✕"
                                             FontSize="14"

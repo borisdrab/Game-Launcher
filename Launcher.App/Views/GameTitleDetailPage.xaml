@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                        xmlns:views="clr-namespace:Launcher.App.Views"
                        xmlns:vm="clr-namespace:Launcher.App.ViewModels"
                        xmlns:m="clr-namespace:Launcher.BL.Models;assembly=Launcher.BL"
-                       xmlns:appmodels="clr-namespace:Launcher.App.Models"
                        x:Class="Launcher.App.Views.GameTitleDetailPage"
                        x:DataType="vm:GameTitleDetailViewModel"
                        BackgroundColor="#352A2A"
                        Shell.NavBarIsVisible="False"
                        Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="210,*,Auto"
-          ColumnDefinitions="*,260"
-          RowSpacing="0"
-          ColumnSpacing="0">
+    <ScrollView>
+        <Grid RowDefinitions="210,Auto,Auto"
+              ColumnDefinitions="*,260"
+              RowSpacing="0"
+              ColumnSpacing="0">
 
         <Grid Grid.Row="0"
               Grid.ColumnSpan="2">
@@ -36,6 +36,7 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="18" />
                 </Border.StrokeShape>
+                
 
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoBackCommand}" />
@@ -96,16 +97,14 @@
                 BackgroundColor="#3C2F2F"
                 StrokeThickness="0"
                 Margin="0">
-            <ScrollView>
-                <VerticalStackLayout Padding="28,22"
-                                     Spacing="18">
-                    <Label Text="{Binding GameTitle.Description}"
-                           TextColor="White"
-                           FontSize="20"
-                           HorizontalTextAlignment="Center"
-                           LineBreakMode="WordWrap" />
-                </VerticalStackLayout>
-            </ScrollView>
+            <VerticalStackLayout Padding="28,22"
+                                 Spacing="18">
+                <Label Text="{Binding GameTitle.Description}"
+                       TextColor="White"
+                       FontSize="20"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
         </Border>
 
         <Border Grid.Row="1"
@@ -113,7 +112,7 @@
                 Grid.Column="1"
                 BackgroundColor="#6A6666"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                   Padding="18">
 
                 <Button Grid.Row="0"
@@ -174,12 +173,11 @@
                                 <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{Binding FavoriteIcon}"
-                                   HorizontalOptions="Center"
+                            <Label HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
-                                   TextColor="{Binding FavoriteIconColor}"
+                                   TextColor="#333333"
                                    FontSize="28"
                                    FontAttributes="Bold"
                                    TranslationY="-1">
@@ -265,6 +263,10 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
+                        
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BuyCommand}" />
+                        </Border.GestureRecognizers>
 
                         <Label Text="{Binding PriceInEurosText}"
                                TextColor="#32C852"
@@ -273,7 +275,7 @@
                     </Border>
                 </HorizontalStackLayout>
 
-                <Grid Grid.Row="5" />
+                <Grid Grid.Row="5" HeightRequest="20" />
 
                 <Grid Grid.Row="6"
                       ColumnDefinitions="90,*"
@@ -337,7 +339,7 @@
                        FontSize="26"
                        FontAttributes="Bold" />
 
-                <CollectionView ItemsSource="{Binding ReviewDisplays}"
+                <CollectionView ItemsSource="{Binding GameTitle.Reviews}"
                                 SelectionMode="None"
                                 HeightRequest="100">
                     <CollectionView.EmptyView>
@@ -347,8 +349,8 @@
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="appmodels:ReviewDisplayItem">
-                            <Label TextColor="Black"
+                        <DataTemplate x:DataType="m:ReviewDetailModel">
+                            <Label TextColor="White"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
                                 <Label.FormattedText>
@@ -357,9 +359,6 @@
                                               FontAttributes="Bold" />
                                         <Span Text=" " />
                                         <Span Text="{Binding Text}" />
-                                        <Span Text=" - " />
-                                        <Span Text="{Binding UserName}"
-                                              FontAttributes="Italic" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
@@ -369,4 +368,5 @@
             </VerticalStackLayout>
         </Border>
     </Grid>
+    </ScrollView>
 </views:ContentPageBase>

@@ -26,7 +26,6 @@ public static class MauiProgram
             });
 
         builder.Services
-            //.AddDALServices("launcher.db") comment for my MacCatalyst error
             .AddDALServices(Path.Combine(FileSystem.AppDataDirectory, "launcher.db"))
             .AddBLServices()
             .AddAppServices();

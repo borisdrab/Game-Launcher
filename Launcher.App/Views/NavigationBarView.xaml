@@ -8,7 +8,6 @@
           HeightRequest="38"
           BackgroundColor="#3D3333">
 
-        <!-- Obchod Tab -->
         <Border Grid.Column="0"
                 x:Name="ObchodTab"
                 BackgroundColor="#3D3333"
@@ -28,7 +27,6 @@
                    VerticalOptions="Center" />
         </Border>
 
-        <!-- Knihovna Tab -->
         <Border Grid.Column="1"
                 x:Name="KnihivnaTab"
                 BackgroundColor="#3D3333"
@@ -48,7 +46,6 @@
                    VerticalOptions="Center" />
         </Border>
 
-        <!-- Socials Tab -->
         <Border Grid.Column="2"
                 x:Name="SocialsTab"
                 BackgroundColor="#3D3333"
@@ -68,7 +65,6 @@
                    VerticalOptions="Center" />
         </Border>
 
-        <!-- User Tab -->
         <Border Grid.Column="3"
                 x:Name="UserTab"
                 BackgroundColor="#3D3333"

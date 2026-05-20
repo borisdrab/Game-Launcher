@@ -27,7 +27,6 @@ public partial class GameTitleDetailViewModel(
     [ObservableProperty]
     private GameTitleDetailModel? _gameTitle;
 
-    // Reviews enriched with user names (for display in the list)
     [ObservableProperty]
     private IEnumerable<ReviewDisplayItem> _reviewDisplays = [];
 
@@ -86,7 +85,6 @@ public partial class GameTitleDetailViewModel(
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
-        // Build review display list with user names
         var users = await userFacade.GetAsync();
         var userNames = users.ToDictionary(u => u.Id, u => u.DisplayName);
 
@@ -160,7 +158,9 @@ public partial class GameTitleDetailViewModel(
 
         try
         {
+            await currentUserService.EnsureCurrentUserAsync();
             var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
             await libraryFacade.AddGameToLibraryAsync(userId, Id);
             IsInLibrary = true;
 
@@ -190,8 +190,10 @@ public partial class GameTitleDetailViewModel(
             return;
         }
 
-        var libraries = await libraryFacade.GetAsync();
+        await currentUserService.EnsureCurrentUserAsync();
         var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+        var libraries = await libraryFacade.GetAsync();
         var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {

@@ -51,7 +51,6 @@ public partial class ReviewDetailViewModel : ViewModelBase,
 
         Review = await _reviewFacade.GetAsync(Id) ?? ReviewDetailModel.Empty;
 
-        // Load related game and user to display their names
         if (Review.GameTitleId != Guid.Empty)
         {
             var game = await _gameTitleFacade.GetAsync(Review.GameTitleId);

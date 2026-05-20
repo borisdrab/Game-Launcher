@@ -21,7 +21,6 @@ public class CurrentUserService : ICurrentUserService
 
     public async Task EnsureCurrentUserAsync()
     {
-        // If no user is selected yet, pick the first one from the database as default
         if (CurrentUser is null)
         {
             var users = await _userFacade.GetAsync();

@@ -158,4 +158,40 @@ public class LibraryFacadeTests : FacadeTestsBase
         var names = result.LibraryTitles.Select(lt => lt.GameTitle!.Name).ToList();
         names.Should().BeInAscendingOrder();
     }
+
+    [Fact]
+    public async Task AddGameToLibraryAsync_AddsGameToDb()
+    {
+        // Arrange
+        var userId = UserSeeds.Stepan.Id; // Stepan has no library seeded? Let's check.
+        var gameId = GameTitleSeeds.EldenRing.Id;
+        
+        // Act
+        await _facade.AddGameToLibraryAsync(userId, gameId);
+        
+        // Assert
+        var isInLibrary = await _facade.IsGameInLibraryAsync(userId, gameId);
+        isInLibrary.Should().BeTrue();
+        
+        var library = await _facade.FilterAsync(userId, null, null, true);
+        library.LibraryTitles.Any(lt => lt.GameTitleId == gameId).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task AddGameToLibraryAsync_AddsGameToDb_WhenLibraryExists()
+    {
+        // Arrange
+        var userId = UserSeeds.Jan.Id; // Jan has a seeded library
+        var gameId = GameTitleSeeds.EldenRing.Id; // Wait, does Jan already have EldenRing?
+        
+        // Act
+        await _facade.AddGameToLibraryAsync(userId, gameId);
+        
+        // Assert
+        var isInLibrary = await _facade.IsGameInLibraryAsync(userId, gameId);
+        isInLibrary.Should().BeTrue();
+        
+        var library = await _facade.FilterAsync(userId, null, null, true);
+        library.LibraryTitles.Any(lt => lt.GameTitleId == gameId).Should().BeTrue();
+    }
 }

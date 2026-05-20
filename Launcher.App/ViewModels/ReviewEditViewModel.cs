@@ -17,34 +17,26 @@ public partial class ReviewEditViewModel : ViewModelBase
     private readonly IAlertService _alertService;
     private readonly ICurrentUserService _currentUserService;
 
-    // If Id is empty Guid -> we are creating a new review.
-    // If Id has a value -> we are editing an existing review.
     public Guid Id { get; set; }
 
     [ObservableProperty]
     private ReviewDetailModel _review = new();
 
-    // List of games the current user can review (filtered by their library)
     [ObservableProperty]
     private IEnumerable<GameTitleListModel> _games = [];
 
-    // True when user has no games in their library (used for empty-state hint)
-    [ObservableProperty]
-    private bool _hasNoGames;
-
-    // Currently selected game
     [ObservableProperty]
     private GameTitleListModel? _selectedGame;
 
-    // The author - shown read-only, taken from CurrentUserService
+    [ObservableProperty]
+    private bool _hasNoGames;
+
     [ObservableProperty]
     private string _authorName = string.Empty;
 
-    // Rating bound to slider AND label
     [ObservableProperty]
     private int _rating = 5;
 
-    // Review text bound to editor
     [ObservableProperty]
     private string _reviewText = string.Empty;
 
@@ -72,7 +64,6 @@ public partial class ReviewEditViewModel : ViewModelBase
     {
         await base.LoadDataAsync();
 
-        // Make sure we have a current user (defaults to first user in DB)
         await _currentUserService.EnsureCurrentUserAsync();
         AuthorName = _currentUserService.CurrentUser?.DisplayName ?? "(no user selected)";
 
@@ -80,8 +71,6 @@ public partial class ReviewEditViewModel : ViewModelBase
 
         if (Id != Guid.Empty)
         {
-            // Edit mode - load existing review and show ALL games
-            // (so the originally reviewed game is visible even if not in current user's library)
             Review = await _reviewFacade.GetAsync(Id) ?? new ReviewDetailModel();
             Games = await _gameTitleFacade.GetAsync();
 
@@ -91,7 +80,6 @@ public partial class ReviewEditViewModel : ViewModelBase
         }
         else
         {
-            // Create mode - only show games the user owns in their library
             var library = await _libraryFacade.FilterAsync(userId, null, null, true);
             var libraryGameIds = library?.LibraryTitles?
                 .Select(lt => lt.GameTitleId)
@@ -109,7 +97,6 @@ public partial class ReviewEditViewModel : ViewModelBase
         OnPropertyChanged(nameof(PageTitle));
     }
 
-    // Clamp rating into 1-5 range
     partial void OnRatingChanged(int value)
     {
         if (value < 1) Rating = 1;
@@ -137,7 +124,6 @@ public partial class ReviewEditViewModel : ViewModelBase
             return;
         }
 
-        // Fill in the review model
         Review.GameTitleId = SelectedGame.Id;
         Review.UserId = _currentUserService.CurrentUser.Id;
         Review.Rating = Rating;

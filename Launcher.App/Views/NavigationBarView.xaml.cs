@@ -2,7 +2,6 @@ namespace Launcher.App.Views;
 
 public partial class NavigationBarView : ContentView
 {
-    // Which tab is currently active (e.g. "Obchod", "Knihovna", "Socials", "Users")
     public static readonly BindableProperty ActiveTabProperty =
         BindableProperty.Create(nameof(ActiveTab), typeof(string), typeof(NavigationBarView),
             defaultValue: "Obchod", propertyChanged: OnActiveTabChanged);
@@ -18,7 +17,6 @@ public partial class NavigationBarView : ContentView
         InitializeComponent();
     }
 
-    // When ActiveTab changes, update which tab has red border
     private static void OnActiveTabChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is NavigationBarView navBar)
@@ -33,8 +31,6 @@ public partial class NavigationBarView : ContentView
 
     private void UpdateTabStyles()
     {
-        // Active tab = red border + darker background
-        // Inactive tab = gray border + normal background
         SetTabStyle(ObchodTab, ActiveTab == "Obchod");
         SetTabStyle(KnihivnaTab, ActiveTab == "Knihovna");
         SetTabStyle(SocialsTab, ActiveTab == "Socials");
@@ -57,7 +53,6 @@ public partial class NavigationBarView : ContentView
         }
     }
 
-    // Navigation handlers
     private async void OnObchodTapped(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("//games");
 

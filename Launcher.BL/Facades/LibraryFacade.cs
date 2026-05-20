@@ -126,7 +126,7 @@ namespace Launcher.BL.Facades
                 var game = await ctx.GameTitles.FindAsync(gameTitleId);
                 if (game != null)
                 {
-                    library.LibraryTitles.Add(new LibraryTitleEntity
+                    ctx.LibraryTitles.Add(new LibraryTitleEntity
                     {
                         LibraryId = library.Id,
                         GameTitleId = gameTitleId,
@@ -136,6 +136,18 @@ namespace Launcher.BL.Facades
                     });
                     await ctx.SaveChangesAsync();
                 }
+            }
+        }
+
+        public async Task RemoveGameFromLibraryAsync(Guid userId, Guid gameTitleId)
+        {
+            var libraryTitle = await ctx.LibraryTitles
+                .FirstOrDefaultAsync(lt => lt.Library!.UserId == userId && lt.GameTitleId == gameTitleId);
+
+            if (libraryTitle != null)
+            {
+                ctx.LibraryTitles.Remove(libraryTitle);
+                await ctx.SaveChangesAsync();
             }
         }
 

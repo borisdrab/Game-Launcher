@@ -6,23 +6,20 @@ using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
 using Launcher.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Launcher.App.ViewModels;
 
 [QueryProperty(nameof(GameTitleId), nameof(GameTitleId))]
-public partial class GameLibraryDetailViewModel : ViewModelBase,
-    IRecipient<LibraryChangedMessage>
+public partial class GameLibraryDetailViewModel(
+    IGameTitleFacade gameTitleFacade,
+    ILibraryFacade libraryFacade,
+    INavigationService navigationService,
+    IMessengerService messengerService,
+    IAlertService alertService,
+    ICurrentUserService currentUserService)
+    : ViewModelBase(messengerService),
+      IRecipient<LibraryChangedMessage>
 {
-    private readonly IGameTitleFacade _gameTitleFacade;
-    private readonly ILibraryFacade _libraryFacade;
-    private readonly INavigationService _navigationService;
-    private readonly IAlertService _alertService;
-    private readonly ICurrentUserService _currentUserService;
-
     public Guid GameTitleId { get; set; }
 
     [ObservableProperty]
@@ -59,35 +56,19 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
         OnPropertyChanged(nameof(AverageRatingText));
     }
 
-    public GameLibraryDetailViewModel(
-        IGameTitleFacade gameTitleFacade,
-        ILibraryFacade libraryFacade,
-        INavigationService navigationService,
-        ICurrentUserService currentUserService,
-        IMessengerService messengerService,
-        IAlertService alertService)
-        : base(messengerService)
-    {
-        _gameTitleFacade = gameTitleFacade;
-        _libraryFacade = libraryFacade;
-        _navigationService = navigationService;
-        _currentUserService = currentUserService;
-        _alertService = alertService;
-    }
-
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
 
-        await _currentUserService.EnsureCurrentUserAsync();
-        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+        await currentUserService.EnsureCurrentUserAsync();
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
 
-        GameTitle = await _gameTitleFacade.GetAsync(GameTitleId)
+        GameTitle = await gameTitleFacade.GetAsync(GameTitleId)
                     ?? GameTitleDetailModel.Empty;
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
-        var library = await _libraryFacade.FilterAsync(userId, null, null, true);
+        var library = await libraryFacade.FilterAsync(userId, null, null, true);
         if (library != null && library.LibraryTitles != null)
         {
             LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);
@@ -99,15 +80,16 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
     {
         if (LibraryTitle != null)
         {
-            await _libraryFacade.ToggleFavoriteAsync(LibraryTitle.LibraryId, GameTitleId);
-            
-            var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
-            var library = await _libraryFacade.FilterAsync(userId, null, null, true);
+            await libraryFacade.ToggleFavoriteAsync(LibraryTitle.LibraryId, GameTitleId);
+            await currentUserService.EnsureCurrentUserAsync();
+            var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+            var library = await libraryFacade.FilterAsync(userId, null, null, true);
             if (library != null && library.LibraryTitles != null)
             {
                 LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);
             }
-            
+
             MessengerService.Send(new LibraryChangedMessage());
         }
     }
@@ -115,13 +97,25 @@ public partial class GameLibraryDetailViewModel : ViewModelBase,
     [RelayCommand]
     private async Task PlayAsync()
     {
-        await _alertService.DisplayAsync("Launcher", $"Starting game {GameTitle?.Name}... (Launcher functionality is disabled)");
+        await alertService.DisplayAsync("Launcher", $"Starting game {GameTitle?.Name}... (Launcher functionality is disabled)");
+    }
+
+    [RelayCommand]
+    private async Task RemoveAsync()
+    {
+        await currentUserService.EnsureCurrentUserAsync();
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+        await libraryFacade.RemoveGameFromLibraryAsync(userId, GameTitleId);
+
+        MessengerService.Send(new LibraryChangedMessage());
+        navigationService.SendBackButtonPressed();
     }
 
     [RelayCommand]
     private async Task GoBackAsync()
     {
-        _navigationService.SendBackButtonPressed();
+        navigationService.SendBackButtonPressed();
         await Task.CompletedTask;
     }
 

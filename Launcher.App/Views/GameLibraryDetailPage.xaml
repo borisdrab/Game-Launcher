@@ -11,12 +11,12 @@
                        Shell.NavBarIsVisible="False"
                        Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="210,*,Auto"
-          ColumnDefinitions="*,260"
-          RowSpacing="0"
-          ColumnSpacing="0">
+    <ScrollView>
+        <Grid RowDefinitions="210,Auto,Auto"
+              ColumnDefinitions="*,260"
+              RowSpacing="0"
+              ColumnSpacing="0">
 
-        <!-- HEADER -->
         <Grid Grid.Row="0"
               Grid.ColumnSpan="2">
             <Image Source="{Binding GameTitle.CoverImageUrl}"
@@ -91,32 +91,28 @@
             </Grid>
         </Grid>
 
-        <!-- DESCRIPTION -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="0"
                 BackgroundColor="#3C2F2F"
                 StrokeThickness="0"
-                Margin="0">
-            <ScrollView>
-                <VerticalStackLayout Padding="28,22"
-                                     Spacing="18">
-                    <Label Text="{Binding GameTitle.Description}"
-                           TextColor="White"
-                           FontSize="20"
-                           HorizontalTextAlignment="Center"
-                           LineBreakMode="WordWrap" />
-                </VerticalStackLayout>
-            </ScrollView>
+                Margin="30">
+            <VerticalStackLayout Padding="28,22" 
+                                 Spacing="18">
+                <Label Text="{Binding GameTitle.Description}"
+                       TextColor="White"
+                       FontSize="20"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
         </Border>
 
-        <!-- RIGHT PANEL -->
         <Border Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="1"
                 BackgroundColor="#6A6666"
                 StrokeThickness="0">
-            <Grid RowDefinitions="Auto,Auto,Auto,* ,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                   Padding="18">
                 
                 <Border Grid.Row="0"
@@ -137,7 +133,6 @@
                         <Image Source="{Binding GameTitle.CoverImageUrl}"
                                Aspect="AspectFill" />
 
-                        <!-- FAVOURITE BUTTON -->
                         <Border WidthRequest="42"
                                 HeightRequest="42"
                                 Margin="8"
@@ -166,7 +161,6 @@
                                    TranslationY="-1" />
                         </Border>
 
-                        <!-- TITLE -->
                         <Grid Margin="10"
                               VerticalOptions="Start">
                             <Label Text="{Binding GameTitle.Name}"
@@ -206,7 +200,6 @@
                     </Grid>
                 </Border>
 
-                <!-- GENRES -->
                 <CollectionView Grid.Row="1"
                                 Margin="0,18,0,0"
                                 ItemsSource="{Binding GameTitle.Genres}"
@@ -221,11 +214,10 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- PLAY -->
-                <HorizontalStackLayout Grid.Row="2"
-                                       Margin="0,18,0,0"
-                                       HorizontalOptions="Center"
-                                       Spacing="10">
+                <VerticalStackLayout Grid.Row="2"
+                                     Margin="0,18,0,0"
+                                     HorizontalOptions="Center"
+                                     Spacing="12">
                     <Border BackgroundColor="#35C85A"
                             Stroke="#2E9E47"
                             StrokeThickness="3"
@@ -248,9 +240,15 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center" />
                     </Border>
-                </HorizontalStackLayout>
+
+                    <Button Text="Remove from Library"
+                            Command="{Binding RemoveCommand}"
+                            BackgroundColor="#AA3333"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="42" />
+                </VerticalStackLayout>
                 
-                <!-- PURCHASE DETAILS -->
                 <VerticalStackLayout Grid.Row="3"
                                      Margin="0,16,0,0"
                                      Spacing="6"
@@ -265,7 +263,6 @@
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
 
-                <!-- PEGI AND AVERAGE RATING -->
                 <Grid Grid.Row="4"
                       ColumnDefinitions="90,*"
                       ColumnSpacing="12"
@@ -310,7 +307,6 @@
             </Grid>
         </Border>
 
-        <!-- REVIEWS -->
         <Border Grid.Row="2"
                 Grid.Column="0"
                 BackgroundColor="#886A6666"
@@ -319,7 +315,7 @@
 
             <VerticalStackLayout Spacing="8">
                 <Label Text="Reviews:"
-                       TextColor="Black"
+                       TextColor="white"
                        FontSize="26"
                        FontAttributes="Bold" />
 
@@ -328,13 +324,13 @@
                                 HeightRequest="100">
                     <CollectionView.EmptyView>
                         <Label Text="No reviews yet"
-                               TextColor="Black"
+                               TextColor="white"
                                FontSize="18" />
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="m:ReviewDetailModel">
-                            <Label TextColor="Black"
+                            <Label TextColor="white"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
                                 <Label.FormattedText>
@@ -352,4 +348,5 @@
             </VerticalStackLayout>
         </Border>
     </Grid>
+    </ScrollView>
 </views:ContentPageBase>

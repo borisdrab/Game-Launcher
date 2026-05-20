@@ -19,7 +19,6 @@ public static class AppInstaller
         services.AddSingleton<IAlertService, AlertService>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
-        // Views
         services.AddTransient<GameTitleListPage>();
         services.AddTransient<GameTitleDetailPage>();
         services.AddTransient<GameTitleEditPage>();
@@ -31,7 +30,6 @@ public static class AppInstaller
         services.AddTransient<UserListPage>();
         services.AddTransient<UserEditPage>();
 
-        // ViewModels
         services.AddTransient<GameTitleListViewModel>();
         services.AddTransient<GameTitleDetailViewModel>();
         services.AddTransient<GameTitleEditViewModel>();

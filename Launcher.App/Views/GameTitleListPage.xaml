@@ -20,7 +20,6 @@
               ColumnDefinitions="200,*"
               ColumnSpacing="0">
 
-            <!-- LEFT SIDEBAR -->
             <Border Grid.Column="0"
                     BackgroundColor="#6A6666"
                     Stroke="Black"
@@ -29,7 +28,6 @@
                     <VerticalStackLayout Padding="14,18"
                                          Spacing="14">
 
-                        <!-- SEARCH -->
                         <Border BackgroundColor="#DDDDDD"
                                 Stroke="Black"
                                 StrokeThickness="2"
@@ -59,7 +57,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- SORT -->
                         <Label Text="Sort by"
                                TextColor="White"
                                FontSize="16"
@@ -79,7 +76,6 @@
                                     BackgroundColor="Transparent" />
                         </Border>
 
-                        <!-- DESCENDING -->
                         <HorizontalStackLayout Spacing="10">
                             <Label Text="Descending"
                                    TextColor="White"
@@ -88,7 +84,6 @@
                             <Switch IsToggled="{Binding SortDescending}" />
                         </HorizontalStackLayout>
 
-                        <!-- GENRES -->
                         <Label Text="Genres"
                                TextColor="White"
                                FontSize="15"
@@ -147,7 +142,6 @@
                 </ScrollView>
             </Border>
 
-            <!-- MAIN CONTENT -->
             <ScrollView Grid.Column="1">
                 <CollectionView ItemsSource="{Binding Games}"
                                 Margin="18">
@@ -201,7 +195,6 @@
 
                                 <Grid ColumnDefinitions="220,*">
 
-                                    <!-- IMAGE -->
                                     <Border Grid.Column="0"
                                             StrokeThickness="0">
                                         <Border.StrokeShape>
@@ -219,7 +212,6 @@
                                             <Image Source="{Binding CoverImageUrl, TargetNullValue=''}"
                                                    Aspect="AspectFill" />
 
-                                            <!-- Star -->
                                             <Border WidthRequest="40"
                                                     HeightRequest="40"
                                                     Margin="8"
@@ -249,7 +241,6 @@
                                         </Grid>
                                     </Border>
 
-                                    <!-- RIGHT INFO -->
                                     <Grid Grid.Column="1"
                                           Padding="16,12,16,16"
                                           RowDefinitions="Auto,*,Auto">

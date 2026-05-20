@@ -49,7 +49,6 @@ public partial class UserListViewModel : ViewModelBase
     [RelayCommand]
     private async Task SelectUserAsync(Guid id)
     {
-        // Set the picked user as the current one (used across the app for reviews etc.)
         var picked = Users.FirstOrDefault(u => u.Id == id);
         if (picked is not null)
         {

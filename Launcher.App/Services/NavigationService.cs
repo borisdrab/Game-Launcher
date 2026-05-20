@@ -5,12 +5,11 @@ namespace Launcher.App.Services;
 
 public class NavigationService : INavigationService
 {
-    // Route constants
     public const string GameListRouteAbsolute = "//games";
     public const string LibraryListRouteAbsolute = "//library";
     public const string SocialsRouteAbsolute = "//socials";
     public const string UserListRouteAbsolute = "//users";
-    
+
     public const string GameDetailRouteRelative = "game-detail";
     public const string GameEditRouteRelative = "game-edit";
     public const string LibraryDetailRouteRelative = "library-detail";
