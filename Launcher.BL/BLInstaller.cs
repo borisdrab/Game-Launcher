@@ -29,7 +29,7 @@ public static class BLInstaller
         // Model Mappers
         services.AddSingleton<IModelMapper<GameTitleEntity, Models.GameTitleListModel, Models.GameTitleDetailModel>, GameTitleModelMapper>();
         services.AddSingleton<IModelMapper<UserEntity, Models.UserListModel, Models.UserDetailModel>, UserModelMapper>();
-        services.AddSingleton<IModelMapper<LibraryEntity, Models.LibraryListModel, Models.LibraryDetailModel>, LibraryMapper>();
+        services.AddSingleton<IModelMapper<LibraryEntity, Models.LibraryListModel, Models.LibraryDetailModel>, LibraryModelMapper>();
         services.AddSingleton<IModelMapper<GenreEntity, Models.GenreListModel, Models.GenreDetailModel>, GenreModelMapper>();
         services.AddSingleton<IModelMapper<PlatformEntity, Models.PlatformListModel, Models.PlatformDetailModel>, PlatformModelMapper>();
         services.AddSingleton<IModelMapper<AchievementEntity, Models.AchievementListModel, Models.AchievementDetailModel>, AchievementModelMapper>();
