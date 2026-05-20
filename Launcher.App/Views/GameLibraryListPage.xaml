@@ -143,9 +143,9 @@
                                 Margin="18">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical"
-                                         Span="2"
-                                         HorizontalItemSpacing="22"
-                                         VerticalItemSpacing="26" />
+                                         Span="4"
+                                         HorizontalItemSpacing="16"
+                                         VerticalItemSpacing="16" />
                     </CollectionView.ItemsLayout>
 
                     <CollectionView.EmptyView>
@@ -168,19 +168,18 @@
                         <DataTemplate x:DataType="models:LibraryItemModel">
                             <Border BackgroundColor="#6A5E5E"
                                     StrokeThickness="0"
-                                    HeightRequest="295"
-                                    WidthRequest="390"
+                                    HeightRequest="220"
                                     Padding="0">
-
+                                
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="22" />
+                                    <RoundRectangle CornerRadius="16" />
                                 </Border.StrokeShape>
 
                                 <Border.Shadow>
                                     <Shadow Brush="Black"
                                             Opacity="0.35"
-                                            Radius="16"
-                                            Offset="8,8" />
+                                            Radius="8"
+                                            Offset="4,4" />
                                 </Border.Shadow>
 
                                 <Border.GestureRecognizers>
@@ -189,153 +188,84 @@
                                         CommandParameter="{Binding Id}" />
                                 </Border.GestureRecognizers>
 
-                                <Grid ColumnDefinitions="220,*">
+                                <Grid>
+                                    <Image Source="{Binding CoverImageUrl, TargetNullValue=''}"
+                                           Aspect="AspectFill" />
 
-                                    <!-- IMAGE -->
-                                    <Border Grid.Column="0"
-                                            StrokeThickness="0">
+                                    <!-- Star -->
+                                    <Border WidthRequest="40"
+                                            HeightRequest="40"
+                                            Margin="8"
+                                            BackgroundColor="#E6E6E6"
+                                            Stroke="#333333"
+                                            StrokeThickness="1.5"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="Start">
                                         <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="22,0,0,22" />
+                                            <RoundRectangle CornerRadius="10" />
                                         </Border.StrokeShape>
+
+                                        <Label Text="{Binding FavoriteIcon}"
+                                               TextColor="{Binding FavoriteIconColor}"
+                                               FontSize="28"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               TranslationY="-1" />
                                         
-                                        <Border.Shadow>
-                                            <Shadow Brush="Black"
-                                                    Opacity="0.35"
-                                                    Radius="14"
-                                                    Offset="10,0" />
-                                        </Border.Shadow>
-
-                                        <Grid>
-                                            <Image Source="{Binding CoverImageUrl, TargetNullValue=''}"
-                                                   Aspect="AspectFill" />
-
-                                            <!-- Star -->
-                                            <Border WidthRequest="40"
-                                                    HeightRequest="40"
-                                                    Margin="8"
-                                                    BackgroundColor="#E6E6E6"
-                                                    Stroke="#333333"
-                                                    StrokeThickness="1.5"
-                                                    HorizontalOptions="End"
-                                                    VerticalOptions="Start">
-                                                <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="10" />
-                                                </Border.StrokeShape>
-
-                                                <Label Text="{Binding FavoriteIcon}"
-                                                       TextColor="{Binding FavoriteIconColor}"
-                                                       FontSize="28"
-                                                       FontAttributes="Bold"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center"
-                                                       TranslationY="-1" />
-                                                
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={x:Reference GameLibraryListRoot}, Path=BindingContext.ToggleFavoriteCommand}"
-                                                        CommandParameter="{Binding Id}" />
-                                                </Border.GestureRecognizers>
-                                            </Border>
-
-                                            <!-- Title -->
-                                            <Grid Margin="10,45,10,0"
-                                                  VerticalOptions="Start">
-                                                <Label Text="{Binding Name}"
-                                                       TextColor="#C00000"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="2"
-                                                       TranslationX="-2"
-                                                       TranslationY="-2" />
-                                                <Label Text="{Binding Name}"
-                                                       TextColor="#C00000"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="2"
-                                                       TranslationX="2"
-                                                       TranslationY="-2" />
-                                                <Label Text="{Binding Name}"
-                                                       TextColor="#C00000"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="2"
-                                                       TranslationX="-2"
-                                                       TranslationY="2" />
-                                                <Label Text="{Binding Name}"
-                                                       TextColor="#C00000"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="2"
-                                                       TranslationX="2"
-                                                       TranslationY="2" />
-                                                <Label Text="{Binding Name}"
-                                                       TextColor="White"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="2" />
-                                            </Grid>
-                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={x:Reference GameLibraryListRoot}, Path=BindingContext.ToggleFavoriteCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                        </Border.GestureRecognizers>
                                     </Border>
 
-                                    <!-- RIGHT INFO -->
-                                    <Grid Grid.Column="1"
-                                          Padding="16,12,16,16"
-                                          RowDefinitions="Auto,*,Auto">
-
+                                    <!-- Title -->
+                                    <Grid Margin="10,45,10,0"
+                                          VerticalOptions="Start">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="#C00000"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="2"
+                                               TranslationX="-2"
+                                               TranslationY="-2" />
+                                        <Label Text="{Binding Name}"
+                                               TextColor="#C00000"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="2"
+                                               TranslationX="2"
+                                               TranslationY="-2" />
+                                        <Label Text="{Binding Name}"
+                                               TextColor="#C00000"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="2"
+                                               TranslationX="-2"
+                                               TranslationY="2" />
+                                        <Label Text="{Binding Name}"
+                                               TextColor="#C00000"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="2"
+                                               TranslationX="2"
+                                               TranslationY="2" />
                                         <Label Text="{Binding Name}"
                                                TextColor="White"
                                                FontSize="18"
                                                FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
                                                LineBreakMode="WordWrap"
-                                               MaxLines="2"
-                                               HorizontalTextAlignment="Center" />
-
-                                        <VerticalStackLayout Grid.Row="1"
-                                                             VerticalOptions="Center"
-                                                             Spacing="4">
-                                            <Label Text="{Binding Publisher}"
-                                                   TextColor="White"
-                                                   FontSize="14"
-                                                   HorizontalTextAlignment="Center"
-                                                   LineBreakMode="WordWrap"
-                                                   MaxLines="2" />
-
-                                            <Label Text="{Binding PegiRating, StringFormat='PEGI {0}'}"
-                                                   TextColor="White"
-                                                   FontSize="14"
-                                                   HorizontalTextAlignment="Center" />
-
-                                            <Label Text="{Binding ReleaseDate, StringFormat='{}{0:yyyy}'}"
-                                                   TextColor="White"
-                                                   FontSize="14"
-                                                   HorizontalTextAlignment="Center" />
-                                        </VerticalStackLayout>
-
-                                        <Border Grid.Row="2"
-                                                BackgroundColor="#DCDCDC"
-                                                Stroke="#35C85A"
-                                                StrokeThickness="5"
-                                                HorizontalOptions="Center"
-                                                Padding="18,4">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="18" />
-                                            </Border.StrokeShape>
-
-                                            <Label Text="{Binding PriceInEurosText}"
-                                                   TextColor="#35C85A"
-                                                   FontSize="22"
-                                                   FontAttributes="Bold" />
-                                        </Border>
+                                               MaxLines="2" />
                                     </Grid>
                                 </Grid>
                             </Border>

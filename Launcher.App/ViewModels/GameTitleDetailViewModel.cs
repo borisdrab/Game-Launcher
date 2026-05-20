@@ -156,7 +156,7 @@ public partial class GameTitleDetailViewModel(
     }
 
     [RelayCommand]
-    private new async Task ToggleFavoriteAsync()
+    private async Task ToggleFavoriteAsync()
     {
         if (!IsInLibrary)
         {
