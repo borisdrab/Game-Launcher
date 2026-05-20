@@ -104,14 +104,16 @@
                     BackgroundColor="#4A4040"
                     TextColor="White"
                     WidthRequest="100"
-                    HeightRequest="42" />
+                    HeightRequest="42"
+                    IsVisible="{Binding CanEdit}" />
 
             <Button Text="Delete"
                     Command="{Binding DeleteCommand}"
                     BackgroundColor="#AA3333"
                     TextColor="White"
                     WidthRequest="100"
-                    HeightRequest="42" />
+                    HeightRequest="42"
+                    IsVisible="{Binding CanEdit}" />
         </HorizontalStackLayout>
 
     </Grid>

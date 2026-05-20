@@ -17,6 +17,7 @@ public partial class ReviewDetailViewModel : ViewModelBase,
     private readonly IGameTitleFacade _gameTitleFacade;
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
+    private readonly ICurrentUserService _currentUserService;
 
     public Guid Id { get; set; }
 
@@ -29,12 +30,16 @@ public partial class ReviewDetailViewModel : ViewModelBase,
     [ObservableProperty]
     private string _userName = string.Empty;
 
+    [ObservableProperty]
+    private bool _canEdit;
+
     public ReviewDetailViewModel(
         IReviewFacade reviewFacade,
         IUserFacade userFacade,
         IGameTitleFacade gameTitleFacade,
         INavigationService navigationService,
         IAlertService alertService,
+        ICurrentUserService currentUserService,
         IMessengerService messengerService)
         : base(messengerService)
     {
@@ -43,11 +48,14 @@ public partial class ReviewDetailViewModel : ViewModelBase,
         _gameTitleFacade = gameTitleFacade;
         _navigationService = navigationService;
         _alertService = alertService;
+        _currentUserService = currentUserService;
     }
 
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
+
+        await _currentUserService.EnsureCurrentUserAsync();
 
         Review = await _reviewFacade.GetAsync(Id) ?? ReviewDetailModel.Empty;
 
@@ -62,12 +70,14 @@ public partial class ReviewDetailViewModel : ViewModelBase,
             var user = await _userFacade.GetAsync(Review.UserId);
             UserName = user?.DisplayName ?? "Unknown user";
         }
+
+        CanEdit = _currentUserService.CurrentUser?.Id == Review.UserId;
     }
 
     [RelayCommand]
     private async Task GoToEditAsync()
     {
-        if (Review is null) return;
+        if (Review is null || !CanEdit) return;
 
         await _navigationService.GoToAsync(
             NavigationService.ReviewEditRouteRelative,
@@ -80,7 +90,7 @@ public partial class ReviewDetailViewModel : ViewModelBase,
     [RelayCommand]
     private async Task DeleteAsync()
     {
-        if (Review is null) return;
+        if (Review is null || !CanEdit) return;
 
         try
         {

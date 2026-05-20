@@ -11,7 +11,7 @@
                        Shell.TabBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
-        <views:NavigationBarView Grid.Row="0" ActiveTab="Obchod" />
+        <views:NavigationBarView Grid.Row="0" ActiveTab="Store" />
 
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="16">

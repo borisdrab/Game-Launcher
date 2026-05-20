@@ -146,6 +146,7 @@
                                             WidthRequest="32"
                                             HeightRequest="32"
                                             Padding="0"
+                                            IsVisible="{Binding IsOwnedByCurrentUser}"
                                             Command="{Binding Source={x:Reference SocialsRoot}, Path=BindingContext.DeleteCommand}"
                                             CommandParameter="{Binding Id}" />
                                 </Grid>

@@ -13,7 +13,7 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <views:NavigationBarView Grid.Row="0" ActiveTab="Knihovna" />
+        <views:NavigationBarView Grid.Row="0" ActiveTab="Library" />
 
         <Grid Grid.Row="1"
               ColumnDefinitions="175,*"

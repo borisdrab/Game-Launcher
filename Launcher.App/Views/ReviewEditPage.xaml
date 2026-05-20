@@ -3,6 +3,7 @@
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                        xmlns:views="clr-namespace:Launcher.App.Views"
                        xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       xmlns:m="clr-namespace:Launcher.BL.Models;assembly=Launcher.BL"
                        x:Class="Launcher.App.Views.ReviewEditPage"
                        x:DataType="vm:ReviewEditViewModel"
                        Shell.NavBarIsVisible="False"
@@ -24,22 +25,54 @@
 
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Game" TextColor="White" FontSize="14" />
+
                     <Border BackgroundColor="White"
                             Stroke="#5A5050"
                             StrokeThickness="1"
-                            Padding="10,0"
+                            Padding="14,10"
                             HeightRequest="44">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <Picker ItemsSource="{Binding Games}"
-                                SelectedItem="{Binding SelectedGame}"
-                                ItemDisplayBinding="{Binding Name}"
-                                Title="Select a game"
-                                TextColor="Black"
-                                TitleColor="#777777"
-                                BackgroundColor="Transparent"
-                                VerticalOptions="Fill" />
+                        <Label Text="{Binding SelectedGameName}"
+                               TextColor="Black"
+                               FontSize="14"
+                               VerticalOptions="Center" />
+                    </Border>
+
+                    <Border BackgroundColor="#4A4040"
+                            Stroke="#5A5050"
+                            StrokeThickness="1"
+                            Padding="0"
+                            MaximumHeightRequest="160">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <CollectionView ItemsSource="{Binding Games}"
+                                        SelectedItem="{Binding SelectedGame}"
+                                        SelectionMode="Single"
+                                        Margin="4">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="m:GameTitleListModel">
+                                    <Grid Padding="12,8" BackgroundColor="Transparent">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal" />
+                                                <VisualState x:Name="Selected">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor" Value="#AA3333" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <Label Text="{Binding Name}"
+                                               TextColor="White"
+                                               FontSize="14"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </Border>
 
                     <Label Text="You don't own any games yet. Buy games in the Obchod tab to be able to review them."

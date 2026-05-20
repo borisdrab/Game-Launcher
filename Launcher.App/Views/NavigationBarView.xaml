@@ -20,7 +20,7 @@
             <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnObchodTapped" />
             </Border.GestureRecognizers>
-            <Label Text="Obchod"
+            <Label Text="Store"
                    TextColor="White"
                    FontSize="14"
                    HorizontalOptions="Center"
@@ -39,7 +39,7 @@
             <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnKnihovnaTapped" />
             </Border.GestureRecognizers>
-            <Label Text="Knihovna"
+            <Label Text="Library"
                    TextColor="White"
                    FontSize="14"
                    HorizontalOptions="Center"

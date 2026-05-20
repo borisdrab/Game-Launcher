@@ -4,7 +4,7 @@ public partial class NavigationBarView : ContentView
 {
     public static readonly BindableProperty ActiveTabProperty =
         BindableProperty.Create(nameof(ActiveTab), typeof(string), typeof(NavigationBarView),
-            defaultValue: "Obchod", propertyChanged: OnActiveTabChanged);
+            defaultValue: "Store", propertyChanged: OnActiveTabChanged);
 
     public string ActiveTab
     {
@@ -31,8 +31,8 @@ public partial class NavigationBarView : ContentView
 
     private void UpdateTabStyles()
     {
-        SetTabStyle(ObchodTab, ActiveTab == "Obchod");
-        SetTabStyle(KnihivnaTab, ActiveTab == "Knihovna");
+        SetTabStyle(ObchodTab, ActiveTab == "Store");
+        SetTabStyle(KnihivnaTab, ActiveTab == "Library");
         SetTabStyle(SocialsTab, ActiveTab == "Socials");
         SetTabStyle(UserTab, ActiveTab == "Users");
     }

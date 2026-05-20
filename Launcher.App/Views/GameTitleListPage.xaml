@@ -14,7 +14,7 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <views:NavigationBarView Grid.Row="0" ActiveTab="Obchod" />
+        <views:NavigationBarView Grid.Row="0" ActiveTab="Store" />
 
         <Grid Grid.Row="1"
               ColumnDefinitions="200,*"

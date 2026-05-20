@@ -10,4 +10,5 @@ public class ReviewDisplayItem
     public int Rating { get; init; }
     public string? Text { get; init; }
     public DateTime CreatedAt { get; init; }
+    public bool IsOwnedByCurrentUser { get; init; }
 }

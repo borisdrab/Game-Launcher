@@ -28,6 +28,13 @@ public partial class ReviewEditViewModel : ViewModelBase
     [ObservableProperty]
     private GameTitleListModel? _selectedGame;
 
+    public string SelectedGameName => SelectedGame?.Name ?? "No game selected";
+
+    partial void OnSelectedGameChanged(GameTitleListModel? value)
+    {
+        OnPropertyChanged(nameof(SelectedGameName));
+    }
+
     [ObservableProperty]
     private bool _hasNoGames;
 

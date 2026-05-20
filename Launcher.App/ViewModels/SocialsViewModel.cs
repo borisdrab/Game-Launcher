@@ -17,6 +17,7 @@ public partial class SocialsViewModel : ViewModelBase,
     private readonly IGameTitleFacade _gameTitleFacade;
     private readonly INavigationService _navigationService;
     private readonly IAlertService _alertService;
+    private readonly ICurrentUserService _currentUserService;
 
     private List<ReviewDisplayItem> _allReviews = new();
 
@@ -32,6 +33,7 @@ public partial class SocialsViewModel : ViewModelBase,
         IGameTitleFacade gameTitleFacade,
         INavigationService navigationService,
         IAlertService alertService,
+        ICurrentUserService currentUserService,
         IMessengerService messengerService)
         : base(messengerService)
     {
@@ -40,6 +42,7 @@ public partial class SocialsViewModel : ViewModelBase,
         _gameTitleFacade = gameTitleFacade;
         _navigationService = navigationService;
         _alertService = alertService;
+        _currentUserService = currentUserService;
     }
 
     protected override async Task LoadDataAsync()
@@ -50,6 +53,9 @@ public partial class SocialsViewModel : ViewModelBase,
 
     private async Task ReloadReviewsAsync()
     {
+        await _currentUserService.EnsureCurrentUserAsync();
+        var currentUserId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         var reviews = await _reviewFacade.GetAsync();
         var users = await _userFacade.GetAsync();
         var games = await _gameTitleFacade.GetAsync();
@@ -65,7 +71,8 @@ public partial class SocialsViewModel : ViewModelBase,
             GameName = gameNames.TryGetValue(r.GameTitleId, out var gn) ? gn : "Unknown game",
             UserName = userNames.TryGetValue(r.UserId, out var un) ? un : "Unknown user",
             Rating = r.Rating,
-            CreatedAt = r.CreatedAt
+            CreatedAt = r.CreatedAt,
+            IsOwnedByCurrentUser = r.UserId == currentUserId
         }).ToList();
 
         ApplyFilter();
