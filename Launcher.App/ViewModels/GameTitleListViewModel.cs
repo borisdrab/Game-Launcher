@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
+using Launcher.BL.Repositories;
 
 namespace Launcher.App.ViewModels;
 
@@ -11,59 +12,50 @@ public partial class GameTitleListViewModel : ViewModelBase
     private readonly IGameTitleFacade _gameTitleFacade;
     private readonly IGenreFacade _genreFacade;
     private readonly INavigationService _navigationService;
-    
-    private IEnumerable<GameTitleListModel> _allGames = [];
-    
-    [ObservableProperty]
-    private IEnumerable<GameTitleListModel> _games = [];
-    
-    [ObservableProperty]
-    private IEnumerable<GenreListModel> _genres = [];
-    
-    [ObservableProperty]
-    private string _searchText = string.Empty;
+    private readonly IAlertService _alertService;
+
+    [ObservableProperty] private IEnumerable<GameTitleListModel> _games = [];
+
+    [ObservableProperty] private IEnumerable<GenreListModel> _genres = [];
+
+    [ObservableProperty] private string _searchText = string.Empty;
 
     public GameTitleListViewModel(
         IGameTitleFacade gameTitleFacade,
         IGenreFacade genreFacade,
         INavigationService navigationService,
+        IAlertService alertService,
         IMessengerService messengerService)
         : base(messengerService)
     {
         _gameTitleFacade = gameTitleFacade;
         _genreFacade = genreFacade;
         _navigationService = navigationService;
+        _alertService = alertService;
     }
 
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
 
-        // Load all games and genres from database
-        _allGames = await _gameTitleFacade.GetAsync();
-        Games = _allGames;
-
-        Genres = await _genreFacade.GetAsync();
+        await RunSafeAsync(async () =>
+        {
+            await LoadGamesAsync();
+            Genres = await _genreFacade.GetAsync();
+        }, _alertService);
     }
-    
+
     partial void OnSearchTextChanged(string value)
     {
-        ApplyFilter();
+        _ = HandleSearchAsync();
     }
 
-    // Filter games by search text
-    private void ApplyFilter()
+    private async Task HandleSearchAsync()
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
+        await RunSafeAsync(async () =>
         {
-            Games = _allGames;
-        }
-        else
-        {
-            Games = _allGames
-                .Where(g => g.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
+            await LoadGamesAsync();
+        }, _alertService);
     }
 
     [RelayCommand]
@@ -71,5 +63,16 @@ public partial class GameTitleListViewModel : ViewModelBase
     {
         // TODO: Navigate to game detail page when it is implemented
         await Task.CompletedTask;
+    }
+
+    private async Task LoadGamesAsync()
+    {
+        Games = await _gameTitleFacade.GetAsync(
+            SearchText,
+            null,
+            null,
+            null,
+            GameTitleSortBy.Name,
+            false);
     }
 }

@@ -34,4 +34,19 @@ public abstract class ViewModelBase : ObservableRecipient
 
     protected virtual Task LoadDataAsync()
         => Task.CompletedTask;
+
+    protected async Task RunSafeAsync(
+        Func<Task> action,
+        IAlertService alertService,
+        string errorTitle = "Error")
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            await alertService.DisplayAsync(errorTitle, ex.Message);
+        }
+    }
 }
