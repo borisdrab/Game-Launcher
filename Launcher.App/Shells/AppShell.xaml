@@ -15,6 +15,6 @@
     <ShellContent Route="library"
                   ContentTemplate="{DataTemplate views:LibraryPlaceholderPage}" />
     <ShellContent Route="socials"
-                  ContentTemplate="{DataTemplate views:SocialsPlaceholderPage}" />
+                  ContentTemplate="{DataTemplate views:SocialsPage}" />
 
 </Shell>

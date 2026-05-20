@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:views="clr-namespace:Launcher.App.Views"
+                       xmlns:vm="clr-namespace:Launcher.App.ViewModels"
+                       x:Class="Launcher.App.Views.ReviewEditPage"
+                       x:DataType="vm:ReviewEditViewModel"
+                       Shell.NavBarIsVisible="False"
+                       Shell.TabBarIsVisible="False"
+                       Title="Edit Review"
+                       BackgroundColor="#352A2A">
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
+
+        <!-- Top: Title -->
+        <Label Grid.Row="0"
+               Text="{Binding PageTitle}"
+               FontSize="24"
+               FontAttributes="Bold"
+               TextColor="White"
+               Margin="0,0,0,16" />
+
+        <!-- Middle: Form -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="14">
+
+                <!-- Game picker -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Game" TextColor="White" FontSize="14" />
+                    <Border BackgroundColor="White"
+                            Stroke="#5A5050"
+                            StrokeThickness="1"
+                            Padding="10,0"
+                            HeightRequest="44">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding Games}"
+                                SelectedItem="{Binding SelectedGame}"
+                                ItemDisplayBinding="{Binding Name}"
+                                Title="Select a game"
+                                TextColor="Black"
+                                TitleColor="#777777"
+                                BackgroundColor="Transparent"
+                                VerticalOptions="Fill" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Author (read-only, shows current user) -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Author" TextColor="White" FontSize="14" />
+                    <Border BackgroundColor="#3A3030"
+                            Stroke="#5A5050"
+                            StrokeThickness="1"
+                            Padding="14,10"
+                            HeightRequest="44">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Label Text="{Binding AuthorName}"
+                               TextColor="#CCCCCC"
+                               FontSize="14"
+                               VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Rating -->
+                <VerticalStackLayout Spacing="4">
+                    <Label TextColor="White" FontSize="14">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Rating: " />
+                                <Span Text="{Binding Rating}" FontAttributes="Bold" TextColor="#FFCC33" />
+                                <Span Text=" / 5" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                    <Slider Minimum="1"
+                            Maximum="5"
+                            Value="{Binding Rating, Mode=TwoWay}"
+                            ThumbColor="#CC3333"
+                            MinimumTrackColor="#AA3333"
+                            MaximumTrackColor="#5A5050" />
+                </VerticalStackLayout>
+
+                <!-- Review text -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Review text" TextColor="White" FontSize="14" />
+                    <Border BackgroundColor="#4A4040"
+                            Stroke="#5A5050"
+                            StrokeThickness="1"
+                            Padding="10"
+                            MinimumHeightRequest="120">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Editor Text="{Binding ReviewText}"
+                                Placeholder="Write your review here..."
+                                PlaceholderColor="#888888"
+                                TextColor="White"
+                                BackgroundColor="Transparent"
+                                AutoSize="TextChanges" />
+                    </Border>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom: Action buttons -->
+        <HorizontalStackLayout Grid.Row="2"
+                               Spacing="12"
+                               HorizontalOptions="End"
+                               Margin="0,16,0,0">
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    BackgroundColor="#4A4040"
+                    TextColor="White"
+                    WidthRequest="100"
+                    HeightRequest="42" />
+
+            <Button Text="Save"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#AA3333"
+                    TextColor="White"
+                    WidthRequest="100"
+                    HeightRequest="42" />
+        </HorizontalStackLayout>
+
+    </Grid>
+</views:ContentPageBase>

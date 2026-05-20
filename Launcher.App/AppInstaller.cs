@@ -17,13 +17,16 @@ public static class AppInstaller
         services.AddSingleton<IMessengerService, MessengerService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAlertService, AlertService>();
+        services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
         // Views
         services.AddTransient<GameTitleListPage>();
         services.AddTransient<GameTitleDetailPage>();
         services.AddTransient<GameTitleEditPage>();
         services.AddTransient<LibraryPlaceholderPage>();
-        services.AddTransient<SocialsPlaceholderPage>();
+        services.AddTransient<SocialsPage>();
+        services.AddTransient<ReviewDetailPage>();
+        services.AddTransient<ReviewEditPage>();
         services.AddTransient<UserListPage>();
 
         services.AddTransient<UserEditPage>();
@@ -33,7 +36,9 @@ public static class AppInstaller
         services.AddTransient<GameTitleDetailViewModel>();
         services.AddTransient<GameTitleEditViewModel>();
         services.AddTransient<LibraryPlaceholderViewModel>();
-        services.AddTransient<SocialsPlaceholderViewModel>();
+        services.AddTransient<SocialsViewModel>();
+        services.AddTransient<ReviewDetailViewModel>();
+        services.AddTransient<ReviewEditViewModel>();
         services.AddTransient<UserListViewModel>();
 
         services.AddTransient<UserEditViewModel>();

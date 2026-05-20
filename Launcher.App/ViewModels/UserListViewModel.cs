@@ -12,6 +12,7 @@ public partial class UserListViewModel : ViewModelBase
 {
     private readonly IUserFacade _userFacade;
     private readonly INavigationService _navigationService;
+    private readonly ICurrentUserService _currentUserService;
 
     [ObservableProperty]
     private IEnumerable<UserListModel> _users = [];
@@ -19,11 +20,13 @@ public partial class UserListViewModel : ViewModelBase
     public UserListViewModel(
         IUserFacade userFacade,
         INavigationService navigationService,
+        ICurrentUserService currentUserService,
         IMessengerService messengerService)
         : base(messengerService)
     {
         _userFacade = userFacade;
         _navigationService = navigationService;
+        _currentUserService = currentUserService;
     }
 
     protected override void OnActivated()
@@ -46,6 +49,13 @@ public partial class UserListViewModel : ViewModelBase
     [RelayCommand]
     private async Task SelectUserAsync(Guid id)
     {
+        // Set the picked user as the current one (used across the app for reviews etc.)
+        var picked = Users.FirstOrDefault(u => u.Id == id);
+        if (picked is not null)
+        {
+            _currentUserService.SetCurrentUser(picked);
+        }
+
         await _navigationService.GoToAsync(NavigationService.LibraryListRouteAbsolute);
     }
 
