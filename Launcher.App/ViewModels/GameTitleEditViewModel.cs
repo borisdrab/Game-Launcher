@@ -1,36 +1,72 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Launcher.App.Messages;
+using Launcher.App.Models;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
 using Launcher.BL.Models;
+using System.Collections.ObjectModel;
 
 namespace Launcher.App.ViewModels;
 
 [QueryProperty(nameof(Id), nameof(Id))]
 public partial class GameTitleEditViewModel(
     IGameTitleFacade gameTitleFacade,
+    IGenreFacade genreFacade,
+    IPlatformFacade platformFacade,
     INavigationService navigationService,
     IMessengerService messengerService,
     IAlertService alertService)
     : ViewModelBase(messengerService)
 {
     public Guid Id { get; set; }
-    
-    public bool CanDelete => Id != Guid.Empty;
 
     [ObservableProperty]
     private GameTitleDetailModel _gameTitle = GameTitleDetailModel.Empty;
 
+    public ObservableCollection<SelectableItem> AvailableGenres { get; } = [];
+    public ObservableCollection<SelectableItem> AvailablePlatforms { get; } = [];
+
     public string PageTitle => Id == Guid.Empty ? "Create Game Title" : "Edit Game Title";
+    public bool CanDelete => Id != Guid.Empty;
 
     protected override async Task LoadDataAsync()
     {
         await base.LoadDataAsync();
 
+        AvailableGenres.Clear();
+        AvailablePlatforms.Clear();
+
+        var allGenres = await genreFacade.GetAsync();
+        var allPlatforms = await platformFacade.GetAsync();
+
         if (Id == Guid.Empty)
         {
-            GameTitle = GameTitleDetailModel.Empty;
+            GameTitle = new GameTitleDetailModel
+            {
+                IsAvailable = true
+            };
+
+            foreach (var genre in allGenres)
+            {
+                AvailableGenres.Add(new SelectableItem
+                {
+                    Id = genre.Id,
+                    Name = genre.Name,
+                    IsSelected = false
+                });
+            }
+
+            foreach (var platform in allPlatforms)
+            {
+                AvailablePlatforms.Add(new SelectableItem
+                {
+                    Id = platform.Id,
+                    Name = platform.Name,
+                    IsSelected = false
+                });
+            }
+
             OnPropertyChanged(nameof(PageTitle));
             OnPropertyChanged(nameof(CanDelete));
             return;
@@ -38,6 +74,29 @@ public partial class GameTitleEditViewModel(
 
         GameTitle = await gameTitleFacade.GetAsync(Id)
                     ?? GameTitleDetailModel.Empty;
+
+        var selectedGenreIds = GameTitle.Genres.Select(x => x.Id).ToHashSet();
+        var selectedPlatformIds = GameTitle.Platforms.Select(x => x.Id).ToHashSet();
+
+        foreach (var genre in allGenres)
+        {
+            AvailableGenres.Add(new SelectableItem
+            {
+                Id = genre.Id,
+                Name = genre.Name,
+                IsSelected = selectedGenreIds.Contains(genre.Id)
+            });
+        }
+
+        foreach (var platform in allPlatforms)
+        {
+            AvailablePlatforms.Add(new SelectableItem
+            {
+                Id = platform.Id,
+                Name = platform.Name,
+                IsSelected = selectedPlatformIds.Contains(platform.Id)
+            });
+        }
 
         OnPropertyChanged(nameof(PageTitle));
         OnPropertyChanged(nameof(CanDelete));
@@ -97,6 +156,9 @@ public partial class GameTitleEditViewModel(
 
             var savedId = await gameTitleFacade.SaveAsync(modelToSave);
 
+            await SyncGenresAsync(savedId);
+            await SyncPlatformsAsync(savedId);
+
             MessengerService.Send(new GameTitleEditMessage
             {
                 GameTitleId = savedId
@@ -109,7 +171,51 @@ public partial class GameTitleEditViewModel(
             await alertService.DisplayAsync("Save error", ex.Message);
         }
     }
-    
+
+    private async Task SyncGenresAsync(Guid gameTitleId)
+    {
+        var currentDetail = await gameTitleFacade.GetAsync(gameTitleId);
+        if (currentDetail is null)
+        {
+            throw new InvalidOperationException("Saved game title could not be loaded.");
+        }
+
+        var currentGenreIds = currentDetail.Genres.Select(x => x.Id).ToHashSet();
+        var selectedGenreIds = AvailableGenres.Where(x => x.IsSelected).Select(x => x.Id).ToHashSet();
+
+        foreach (var genreId in selectedGenreIds.Except(currentGenreIds))
+        {
+            await gameTitleFacade.AddGenreAsync(gameTitleId, genreId);
+        }
+
+        foreach (var genreId in currentGenreIds.Except(selectedGenreIds))
+        {
+            await gameTitleFacade.RemoveGenreAsync(gameTitleId, genreId);
+        }
+    }
+
+    private async Task SyncPlatformsAsync(Guid gameTitleId)
+    {
+        var currentDetail = await gameTitleFacade.GetAsync(gameTitleId);
+        if (currentDetail is null)
+        {
+            throw new InvalidOperationException("Saved game title could not be loaded.");
+        }
+
+        var currentPlatformIds = currentDetail.Platforms.Select(x => x.Id).ToHashSet();
+        var selectedPlatformIds = AvailablePlatforms.Where(x => x.IsSelected).Select(x => x.Id).ToHashSet();
+
+        foreach (var platformId in selectedPlatformIds.Except(currentPlatformIds))
+        {
+            await gameTitleFacade.AddPlatformAsync(gameTitleId, platformId);
+        }
+
+        foreach (var platformId in currentPlatformIds.Except(selectedPlatformIds))
+        {
+            await gameTitleFacade.RemovePlatformAsync(gameTitleId, platformId);
+        }
+    }
+
     [RelayCommand]
     private async Task DeleteAsync()
     {
@@ -135,7 +241,6 @@ public partial class GameTitleEditViewModel(
     [RelayCommand]
     private async Task CancelAsync()
     {
-        navigationService.SendBackButtonPressed();
-        await Task.CompletedTask;
+        await navigationService.GoToAsync(NavigationService.GameListRouteAbsolute);
     }
 }
