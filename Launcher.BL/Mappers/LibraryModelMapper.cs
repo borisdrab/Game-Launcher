@@ -1,7 +1,6 @@
-using Launcher.BL.Models;
+﻿using Launcher.BL.Models;
 using Launcher.DAL.Entities;
 using System;
-using System.Linq;
 
 namespace Launcher.BL.Mappers;
 
@@ -15,34 +14,9 @@ public class LibraryModelMapper
         {
             Id = entity.Id,
             Name = entity.Name,
+            LibraryTitles = entity.LibraryTitles,
             UserId = entity.UserId,
-            User = entity.User is null ? null : new UserDetailModel
-            {
-                Id = entity.User.Id,
-                UserName = entity.User.UserName,
-                Email = entity.User.Email,
-                DisplayName = entity.User.DisplayName,
-                AvatarUrl = entity.User.AvatarUrl
-            },
-            LibraryTitles = entity.LibraryTitles.Select(lt => new LibraryTitleListModel
-            {
-                LibraryId = lt.LibraryId,
-                GameTitleId = lt.GameTitleId,
-                AddedAt = lt.AddedAt,
-                IsFavorite = lt.IsFavorite,
-                PriceCentsAtPurchase = lt.PriceCentsAtPurchase,
-                GameTitle = lt.GameTitle is null ? null : new GameTitleListModel
-                {
-                    Id = lt.GameTitle.Id,
-                    Name = lt.GameTitle.Name,
-                    PegiRating = lt.GameTitle.PegiRating,
-                    PriceCents = lt.GameTitle.PriceCents,
-                    CoverImageUrl = lt.GameTitle.CoverImageUrl,
-                    Publisher = lt.GameTitle.Publisher,
-                    ReleaseDate = lt.GameTitle.ReleaseDate,
-                    IsAvailable = lt.GameTitle.IsAvailable
-                }
-            }).ToList()
+            User = entity.User,
         };
 
     public override LibraryEntity MapToEntity(LibraryDetailModel model)
@@ -50,7 +24,10 @@ public class LibraryModelMapper
     {
         Id = model.Id,
         Name = model.Name,
+        LibraryTitles = model.LibraryTitles,
+        User = model.User,
         UserId = model.UserId,
+
     };
 
     public override LibraryListModel MapToListModel(LibraryEntity? entity)
@@ -60,32 +37,8 @@ public class LibraryModelMapper
         {
             Id = entity.Id,
             Name = entity.Name,
+            LibraryTitles = entity.LibraryTitles,
+            User = entity.User,
             UserId = entity.UserId,
-            User = entity.User is null ? null : new UserListModel
-            {
-                Id = entity.User.Id,
-                UserName = entity.User.UserName,
-                DisplayName = entity.User.DisplayName,
-                AvatarUrl = entity.User.AvatarUrl
-            },
-            LibraryTitles = entity.LibraryTitles.Select(lt => new LibraryTitleListModel
-            {
-                LibraryId = lt.LibraryId,
-                GameTitleId = lt.GameTitleId,
-                AddedAt = lt.AddedAt,
-                IsFavorite = lt.IsFavorite,
-                PriceCentsAtPurchase = lt.PriceCentsAtPurchase,
-                GameTitle = lt.GameTitle is null ? null : new GameTitleListModel
-                {
-                    Id = lt.GameTitle.Id,
-                    Name = lt.GameTitle.Name,
-                    PegiRating = lt.GameTitle.PegiRating,
-                    PriceCents = lt.GameTitle.PriceCents,
-                    CoverImageUrl = lt.GameTitle.CoverImageUrl,
-                    Publisher = lt.GameTitle.Publisher,
-                    ReleaseDate = lt.GameTitle.ReleaseDate,
-                    IsAvailable = lt.GameTitle.IsAvailable
-                }
-            }).ToList()
         };
 }
