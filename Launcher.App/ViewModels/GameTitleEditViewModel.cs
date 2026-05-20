@@ -3,12 +3,16 @@ using CommunityToolkit.Mvvm.Input;
 using Launcher.App.Messages;
 using Launcher.App.Services;
 using Launcher.BL.Facades.Interfaces;
+using Launcher.BL.Facades;
 using Launcher.BL.Models;
 
 namespace Launcher.App.ViewModels;
 
 [QueryProperty(nameof(Id), nameof(Id))]
 public partial class GameTitleEditViewModel(
+    IGameTitleFacade gameTitleFacade,
+    IAlertService alertService,
+    INavigationService navigationService,
     IMessengerService messengerService)
     : ViewModelBase(messengerService)
 {

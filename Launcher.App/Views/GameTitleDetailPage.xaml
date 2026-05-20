@@ -233,6 +233,10 @@
                             Stroke="#32C852"
                             StrokeThickness="5"
                             Padding="16,4">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BuyCommand}" />
+                        </Border.GestureRecognizers>
+                        
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>

@@ -196,5 +196,6 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     public void Receive(LibraryChangedMessage message)
     {
         ForceDataRefreshOnNextAppearing();
+        _ = ReloadGamesAsync();
     }
 }

@@ -168,7 +168,8 @@
                         <DataTemplate x:DataType="models:LibraryItemModel">
                             <Border BackgroundColor="#6A5E5E"
                                     StrokeThickness="0"
-                                    HeightRequest="220"
+                                    HeightRequest="295"
+                                    WidthRequest="200"
                                     Padding="0">
                                 
                                 <Border.StrokeShape>

@@ -126,7 +126,7 @@ namespace Launcher.BL.Facades
                 var game = await ctx.GameTitles.FindAsync(gameTitleId);
                 if (game != null)
                 {
-                    library.LibraryTitles.Add(new LibraryTitleEntity
+                    ctx.LibraryTitles.Add(new LibraryTitleEntity
                     {
                         LibraryId = library.Id,
                         GameTitleId = gameTitleId,
