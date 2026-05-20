@@ -20,7 +20,8 @@ public partial class GameLibraryDetailViewModel(
     ILibraryFacade libraryFacade,
     INavigationService navigationService,
     IMessengerService messengerService,
-    IAlertService alertService)
+    IAlertService alertService,
+    ICurrentUserService currentUserService)
     : ViewModelBase(messengerService),
       IRecipient<LibraryChangedMessage>
 {
@@ -72,7 +73,10 @@ public partial class GameLibraryDetailViewModel(
 
         GameTitle.ReleaseDate ??= DateTime.Today;
 
-        var library = await libraryFacade.FilterAsync(UserSeeds.Jan.Id, null, null, true);
+        await currentUserService.EnsureCurrentUserAsync();
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+        var library = await libraryFacade.FilterAsync(userId, null, null, true);
         if (library != null && library.LibraryTitles != null)
         {
             LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);
@@ -85,8 +89,10 @@ public partial class GameLibraryDetailViewModel(
         if (LibraryTitle != null)
         {
             await libraryFacade.ToggleFavoriteAsync(LibraryTitle.LibraryId, GameTitleId);
+            await currentUserService.EnsureCurrentUserAsync();
+            var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
             
-            var library = await libraryFacade.FilterAsync(UserSeeds.Jan.Id, null, null, true);
+            var library = await libraryFacade.FilterAsync(userId, null, null, true);
             if (library != null && library.LibraryTitles != null)
             {
                 LibraryTitle = library.LibraryTitles.FirstOrDefault(lt => lt.GameTitleId == GameTitleId);

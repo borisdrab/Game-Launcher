@@ -28,6 +28,7 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     private readonly ILibraryFacade _libraryFacade;
     private readonly IGenreFacade _genreFacade;
     private readonly INavigationService _navigationService;
+    private readonly ICurrentUserService _currentUserService;
 
     [ObservableProperty]
     private IEnumerable<LibraryItemModel> _libraryItems = [];
@@ -49,12 +50,14 @@ public partial class GameLibraryListViewModel : ViewModelBase,
         ILibraryFacade libraryFacade,
         IGenreFacade genreFacade,
         INavigationService navigationService,
-        IMessengerService messengerService)
+        IMessengerService messengerService,
+        ICurrentUserService currentUserService)
         : base(messengerService)
     {
         _libraryFacade = libraryFacade;
         _genreFacade = genreFacade;
         _navigationService = navigationService;
+        _currentUserService = currentUserService;
 
         Genres.CollectionChanged += Genres_CollectionChanged;
     }
@@ -141,8 +144,11 @@ public partial class GameLibraryListViewModel : ViewModelBase,
             _ => null
         };
 
+        await _currentUserService.EnsureCurrentUserAsync();
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         var library = await _libraryFacade.FilterAsync(
-            UserSeeds.Jan.Id,
+            userId,
             string.IsNullOrWhiteSpace(SearchText) ? null : SearchText,
             sortBy,
             !SortDescending,
@@ -173,8 +179,11 @@ public partial class GameLibraryListViewModel : ViewModelBase,
     [RelayCommand]
     private async Task ToggleFavoriteAsync(Guid gameTitleId)
     {
+        await _currentUserService.EnsureCurrentUserAsync();
+        var userId = _currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
         var libraries = await _libraryFacade.GetAsync();
-        var userLibrary = libraries.FirstOrDefault(l => l.UserId == UserSeeds.Jan.Id);
+        var userLibrary = libraries.FirstOrDefault(l => l.UserId == userId);
         if (userLibrary != null)
         {
             await _libraryFacade.ToggleFavoriteAsync(userLibrary.Id, gameTitleId);
