@@ -319,7 +319,7 @@
 
             <VerticalStackLayout Spacing="8">
                 <Label Text="Reviews:"
-                       TextColor="Black"
+                       TextColor="white"
                        FontSize="26"
                        FontAttributes="Bold" />
 
@@ -328,13 +328,13 @@
                                 HeightRequest="100">
                     <CollectionView.EmptyView>
                         <Label Text="No reviews yet"
-                               TextColor="Black"
+                               TextColor="white"
                                FontSize="18" />
                     </CollectionView.EmptyView>
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="m:ReviewDetailModel">
-                            <Label TextColor="Black"
+                            <Label TextColor="white"
                                    FontSize="18"
                                    LineBreakMode="WordWrap">
                                 <Label.FormattedText>
