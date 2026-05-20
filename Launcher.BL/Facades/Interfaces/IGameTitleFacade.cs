@@ -14,4 +14,10 @@ public interface IGameTitleFacade
         IEnumerable<Guid>? genreIds,
         GameTitleSortBy? sortBy,
         bool descending);
+    
+    Task AddGenreAsync(Guid gameTitleId, Guid genreId);
+    Task RemoveGenreAsync(Guid gameTitleId, Guid genreId);
+
+    Task AddPlatformAsync(Guid gameTitleId, Guid platformId);
+    Task RemovePlatformAsync(Guid gameTitleId, Guid platformId);
 }

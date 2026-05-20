@@ -100,4 +100,22 @@ public class GameTitleModelMapper
             ReleaseDate = model.ReleaseDate,
             IsAvailable = model.IsAvailable
         };
+    
+    public GameTitleGenreEntity MapGenreToEntity(Guid gameTitleId, Guid genreId)
+    {
+        return new GameTitleGenreEntity
+        {
+            GameTitleId = gameTitleId,
+            GenreId = genreId
+        };
+    }
+
+    public GameTitlePlatformEntity MapPlatformToEntity(Guid gameTitleId, Guid platformId)
+    {
+        return new GameTitlePlatformEntity
+        {
+            GameTitleId = gameTitleId,
+            PlatformId = platformId
+        };
+    }
 }

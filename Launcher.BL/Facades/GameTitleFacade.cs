@@ -62,10 +62,12 @@ public class GameTitleFacade(
         {
             query = query.Where(x => x.Publisher.Contains(publisher));
         }
+        
+        var genreIdSet = genreIds?.ToHashSet();
 
-        if (genreIds is not null && genreIds.Any())
+        if (genreIdSet is not null && genreIdSet.Count > 0)
         {
-            query = query.Where(x => x.GameTitleGenres.Any(gtg => genreIds.Contains(gtg.GenreId)));
+            query = query.Where(x => x.GameTitleGenres.Any(gtg => genreIdSet.Contains(gtg.GenreId)));
         }
 
         query = (sortBy, descending) switch
@@ -121,6 +123,7 @@ public class GameTitleFacade(
             .Include(x => x.GameTitlePlatforms)
                 .ThenInclude(x => x.Platform)
             .Include(x => x.Reviews)
+                .ThenInclude(x => x.User)
             .Include(x => x.Achievements)
             .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -182,6 +185,82 @@ public class GameTitleFacade(
         }
 
         dbContext.GameTitles.Remove(entity);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task AddGenreAsync(Guid gameTitleId, Guid genreId)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        bool gameExists = await dbContext.GameTitles.AnyAsync(x => x.Id == gameTitleId);
+        if (!gameExists)
+        {
+            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
+        }
+
+        bool relationExists = await dbContext.Set<GameTitleGenreEntity>()
+            .AnyAsync(x => x.GameTitleId == gameTitleId && x.GenreId == genreId);
+
+        if (relationExists)
+        {
+            return;
+        }
+
+        dbContext.Set<GameTitleGenreEntity>().Add(mapper.MapGenreToEntity(gameTitleId, genreId));
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task RemoveGenreAsync(Guid gameTitleId, Guid genreId)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        GameTitleGenreEntity? relation = await dbContext.Set<GameTitleGenreEntity>()
+            .SingleOrDefaultAsync(x => x.GameTitleId == gameTitleId && x.GenreId == genreId);
+
+        if (relation is null)
+        {
+            return;
+        }
+
+        dbContext.Set<GameTitleGenreEntity>().Remove(relation);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task AddPlatformAsync(Guid gameTitleId, Guid platformId)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        bool gameExists = await dbContext.GameTitles.AnyAsync(x => x.Id == gameTitleId);
+        if (!gameExists)
+        {
+            throw new InvalidOperationException($"GameTitle with id {gameTitleId} was not found.");
+        }
+
+        bool relationExists = await dbContext.Set<GameTitlePlatformEntity>()
+            .AnyAsync(x => x.GameTitleId == gameTitleId && x.PlatformId == platformId);
+
+        if (relationExists)
+        {
+            return;
+        }
+
+        dbContext.Set<GameTitlePlatformEntity>().Add(mapper.MapPlatformToEntity(gameTitleId, platformId));
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task RemovePlatformAsync(Guid gameTitleId, Guid platformId)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        GameTitlePlatformEntity? relation = await dbContext.Set<GameTitlePlatformEntity>()
+            .SingleOrDefaultAsync(x => x.GameTitleId == gameTitleId && x.PlatformId == platformId);
+
+        if (relation is null)
+        {
+            return;
+        }
+
+        dbContext.Set<GameTitlePlatformEntity>().Remove(relation);
         await dbContext.SaveChangesAsync();
     }
 }
