@@ -139,6 +139,18 @@ namespace Launcher.BL.Facades
             }
         }
 
+        public async Task RemoveGameFromLibraryAsync(Guid userId, Guid gameTitleId)
+        {
+            var libraryTitle = await ctx.LibraryTitles
+                .FirstOrDefaultAsync(lt => lt.Library!.UserId == userId && lt.GameTitleId == gameTitleId);
+
+            if (libraryTitle != null)
+            {
+                ctx.LibraryTitles.Remove(libraryTitle);
+                await ctx.SaveChangesAsync();
+            }
+        }
+
         public async Task ToggleFavoriteAsync(Guid libraryId, Guid gameTitleId)
         {
             var libraryTitle = await ctx.LibraryTitles

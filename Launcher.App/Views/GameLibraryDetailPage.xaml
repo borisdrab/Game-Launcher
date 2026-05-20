@@ -222,10 +222,10 @@
                 </CollectionView>
 
                 <!-- PLAY -->
-                <HorizontalStackLayout Grid.Row="2"
-                                       Margin="0,18,0,0"
-                                       HorizontalOptions="Center"
-                                       Spacing="10">
+                <VerticalStackLayout Grid.Row="2"
+                                     Margin="0,18,0,0"
+                                     HorizontalOptions="Center"
+                                     Spacing="12">
                     <Border BackgroundColor="#35C85A"
                             Stroke="#2E9E47"
                             StrokeThickness="3"
@@ -248,7 +248,14 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center" />
                     </Border>
-                </HorizontalStackLayout>
+
+                    <Button Text="Remove from Library"
+                            Command="{Binding RemoveCommand}"
+                            BackgroundColor="#AA3333"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="42" />
+                </VerticalStackLayout>
                 
                 <!-- PURCHASE DETAILS -->
                 <VerticalStackLayout Grid.Row="3"

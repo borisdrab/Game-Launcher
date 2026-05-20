@@ -109,6 +109,18 @@ public partial class GameLibraryDetailViewModel(
     }
 
     [RelayCommand]
+    private async Task RemoveAsync()
+    {
+        await currentUserService.EnsureCurrentUserAsync();
+        var userId = currentUserService.CurrentUser?.Id ?? Guid.Empty;
+
+        await libraryFacade.RemoveGameFromLibraryAsync(userId, GameTitleId);
+        
+        MessengerService.Send(new LibraryChangedMessage());
+        navigationService.SendBackButtonPressed();
+    }
+
+    [RelayCommand]
     private async Task GoBackAsync()
     {
         navigationService.SendBackButtonPressed();

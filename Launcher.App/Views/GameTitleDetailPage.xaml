@@ -35,6 +35,7 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="18" />
                 </Border.StrokeShape>
+                
 
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoBackCommand}" />
@@ -263,6 +264,10 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
+                        
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BuyCommand}" />
+                        </Border.GestureRecognizers>
 
                         <Label Text="{Binding PriceInEurosText}"
                                TextColor="#32C852"
