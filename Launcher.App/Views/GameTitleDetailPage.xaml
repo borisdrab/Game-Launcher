@@ -186,18 +186,6 @@
                                    FontSize="28"
                                    FontAttributes="Bold"
                                    TranslationY="-1">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label"
-                                                 Binding="{Binding IsFavorite}"
-                                                 Value="True">
-                                        <Setter Property="Text" Value="★" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Label"
-                                                 Binding="{Binding IsFavorite}"
-                                                 Value="False">
-                                        <Setter Property="Text" Value="☆" />
-                                    </DataTrigger>
-                                </Label.Triggers>
                             </Label>
                         </Border>
                     </Grid>
@@ -223,14 +211,14 @@
                                        Margin="0,18,0,0"
                                        HorizontalOptions="Center"
                                        Spacing="10">
-                    <Label Text="Buy:"
+                    <Label Text="{Binding PurchaseStatusText}"
                            TextColor="White"
                            FontSize="22"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
 
                     <Border BackgroundColor="#D9D9D9"
-                            Stroke="#32C852"
+                            Stroke="{Binding PurchaseButtonColor}"
                             StrokeThickness="5"
                             Padding="16,4">
                         <Border.GestureRecognizers>
@@ -241,8 +229,8 @@
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
 
-                        <Label Text="{Binding PriceInEurosText}"
-                               TextColor="#32C852"
+                        <Label Text="{Binding PurchasePriceText}"
+                               TextColor="{Binding PurchaseButtonColor}"
                                FontSize="24"
                                FontAttributes="Bold" />
                     </Border>
