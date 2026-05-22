@@ -1,22 +1,105 @@
-# Introduction  
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# 🎮 Game Launcher
 
-Repository connection tested after migration to the new Azure DevOps organization. :)
+Modern desktop game launcher built with .NET MAUI following the MVVM architectural pattern.
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+The application provides a centralized platform for browsing games, managing personal libraries, publishing reviews, interacting with other users, and organizing game-related content through a clean multi-layered architecture.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Features
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+-  Browse games in the Store
+-  Manage personal game library
+-  Create and edit reviews
+-  User profiles and social features
+-  Search, filtering and sorting
+-  Persistent SQLite database storage
+-  CRUD operations across all major entities
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Architecture
+
+The project follows a layered architecture:
+
+```text
+App (MAUI UI)
+    ↓
+Business Logic Layer (BL)
+    ↓
+Data Access Layer (DAL)
+    ↓
+SQLite Database
+```
+
+The frontend is implemented using the MVVM pattern:
+
+```text
+View
+    ↓
+ViewModel
+    ↓
+Facade
+    ↓
+Repository
+    ↓
+DbContext
+    ↓
+SQLite
+```
+
+## Technology Stack
+
+- C#
+- .NET 10
+- .NET MAUI
+- Entity Framework Core
+- SQLite
+- CommunityToolkit.Mvvm
+- Dependency Injection
+- xUnit
+- Azure DevOps
+
+## Project Structure
+
+```text
+Launcher.App          MAUI frontend
+Launcher.BL           Business Logic Layer
+Launcher.DAL          Data Access Layer
+Launcher.BL.Tests     Business layer tests
+Launcher.DAL.Tests    Data layer tests
+```
+
+## Running the Application
+
+### Prerequisites
+
+- .NET 10 SDK
+- MAUI Workloads installed
+
+### Build
+
+```bash
+dotnet build
+```
+
+### Run
+
+```bash
+dotnet run --project Launcher.App
+```
+
+### Tests
+
+```bash
+dotnet test
+```
+
+## Design Patterns
+
+- MVVM
+- Dependency Injection
+- Repository
+- Facade
+- Unit of Work (via EF Core DbContext)
+
+## Authors
+Developed as a team project during the *C# Seminar* course at FIT VUT.
+
+Developed as a team project using Azure DevOps, Git, code reviews and pull request workflows.
