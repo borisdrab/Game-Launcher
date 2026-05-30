@@ -102,4 +102,4 @@ dotnet test
 ## Authors
 Developed as a team project during the *C# Seminar* course at FIT VUT.
 
-The project was managed through Azure DevOps, Git, code reviews and pull request workflows.
+The project was managed through Azure DevOps, Git, code reviews and pull request workflows. 
